@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Реєстрація та збереження даних</title>
+
+    <!-- Вбудовані стилі -->
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .hidden {
+            display: none;
+        }
+        h1 {
+            color: #5a4bcf;
+        }
+        p {
+            line-height: 1.6;
+        }
+        #user-info, #data-section {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #5a4bcf;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #483b9f;
+        }
+        #form-status {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        #saved-data-display {
+            font-style: italic;
+            color: #0056b3;
+            background-color: #e7f3ff;
+            padding: 10px;
+            border-radius: 4px;
+            word-wrap: break-word;
+        }
+    </style>
+
+    <!-- Підключення віджету Netlify Identity -->
+    <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Сайт з реєстрацією на Netlify</h1>
+        <p>Натисніть на кнопку нижче, щоб зареєструватися або увійти.</p>
+        
+        <div data-netlify-identity-menu></div>
+
+        <div id="user-info" class="hidden">
+            <h2>Ваш профіль</h2>
+            <p>Ви увійшли як: <strong id="user-email"></strong></p>
+        </div>
+        
+        <div id="data-section" class="hidden">
+            <h3>Ваші збережені дані</h3>
+            <p>Тут відображатимуться дані, які ви зберегли у своєму профілі.</p>
+            <div id="saved-data-display">Завантаження даних...</div>
+            
+            <hr style="margin: 20px 0;">
+
+            <form id="save-data-form">
+                <label for="user-custom-data"><strong>Оновити або додати дані:</strong></label><br><br>
+                <input type="text" id="user-custom-data" placeholder="Введіть будь-який текст" required>
+                <button type="submit">Зберегти в профілі</button>
+            </form>
+            <p id="form-status"></p>
+        </div>
+    </div>
+
+    <!-- Основний JavaScript-код -->
+    <script>
+        // Глобальна змінна для нашого "спостерігача", щоб ми могли його вимкнути
+        let iframeObserver = null;
+
+        // Коли віджет Netlify ВІДКРИВАЄ своє вікно (iframe)
+        netlifyIdentity.on('open', () => {
+            // Даємо мікро-паузу, щоб iframe точно встиг з'явитися в DOM
+            setTimeout(() => {
+                const iframe = document.getElementById('netlify-identity-widget');
+                if (!iframe) return;
+
+                const iframeDoc = iframe.contentDocument;
+                if (!iframeDoc) return;
+
+                // Функція, яка знаходить і ховає елемент всередині iframe
+                const hideCallout = () => {
+                    const callout = iframeDoc.querySelector('.callOut');
+                    if (callout) {
+                        // Надійно ховаємо елемент. Видаляти його не варто, 
+                        // щоб не зламати скрипт віджета.
+                        callout.style.display = 'none';
+                    }
+                };
+                
+                // Спробуємо сховати елемент одразу
+                hideCallout();
+
+                // Створюємо спостерігача, який буде стежити за змінами ВЖЕ ВСЕРЕДИНІ iframe
+                iframeObserver = new MutationObserver(hideCallout);
+                
+                // Запускаємо спостереження за тілом документа всередині iframe
+                iframeObserver.observe(iframeDoc.body, {
+                    childList: true,
+                    subtree: true
+                });
+
+            }, 10); // 10 мілісекунд зазвичай достатньо
+        });
+
+        // Коли віджет ЗАКРИВАЄ своє вікно
+        netlifyIdentity.on('close', () => {
+            // Зупиняємо та відключаємо нашого спостерігача, щоб не витрачати ресурси
+            if (iframeObserver) {
+                iframeObserver.disconnect();
+                iframeObserver = null;
+            }
+        });
+
+
+        // Основна логіка роботи сайту (залишається без змін)
+        document.addEventListener('DOMContentLoaded', () => {
+            const userInfoDiv = document.getElementById('user-info');
+            const dataSectionDiv = document.getElementById('data-section');
+            const userEmailEl = document.getElementById('user-email');
+            const savedDataEl = document.getElementById('saved-data-display');
+            const saveDataForm = document.getElementById('save-data-form');
+            const customDataInput = document.getElementById('user-custom-data');
+            const formStatusEl = document.getElementById('form-status');
+
+            const updateUI = (user) => {
+                if (user) {
+                    userInfoDiv.classList.remove('hidden');
+                    dataSectionDiv.classList.remove('hidden');
+                    userEmailEl.textContent = user.email;
+
+                    const savedInfo = user.user_metadata.custom_info;
+                    if (savedInfo) {
+                        savedDataEl.textContent = savedInfo;
+                    } else {
+                        savedDataEl.textContent = "У вас ще немає збережених даних.";
+                    }
+                } else {
+                    userInfoDiv.classList.add('hidden');
+                    dataSectionDiv.classList.add('hidden');
+                }
+            };
+
+            netlifyIdentity.on('init', user => { updateUI(user); });
+            netlifyIdentity.on('login', user => { updateUI(user); netlifyIdentity.close(); });
+            netlifyIdentity.on('logout', () => { updateUI(null); });
+
+            saveDataForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const user = netlifyIdentity.currentUser();
+                const dataToSave = customDataInput.value;
+
+                if (!user) {
+                    formStatusEl.textContent = "Помилка: Ви не авторизовані.";
+                    return;
+                }
+
+                formStatusEl.textContent = "Збереження...";
+
+                try {
+                    await user.update({ data: { custom_info: dataToSave } });
+                    formStatusEl.textContent = "Дані успішно збережено!";
+                    savedDataEl.textContent = dataToSave;
+                    customDataInput.value = '';
+                } catch (error) {
+                    formStatusEl.textContent = `Помилка збереження: ${error.message}`;
+                    console.error(error);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

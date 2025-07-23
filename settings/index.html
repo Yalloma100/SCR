@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Налаштування - SCR</title>
+    
+    <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    
+    <!-- Підключення шрифтів -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #9333ea; /* Purple */
+            --primary-glow: rgba(147, 51, 234, 0.4);
+            --primary-hover: #a855f7;
+            --success-color: #22c55e; /* Green */
+            --danger-color: #ef4444; /* Red */
+
+            --bg-main: #020617; /* Дуже темний синій */
+            --bg-sidebar: #0f172a; /* Темний синій */
+            --bg-card: rgba(15, 23, 42, 0.75);
+            --bg-input: rgba(15, 23, 42, 0.5);
+            
+            --text-primary: #f8fafc; /* Білий */
+            --text-secondary: #94a3b8; /* Сірий */
+            
+            --border-color: rgba(51, 65, 85, 0.5);
+            --border-focus: rgba(147, 51, 234, 0.8);
+
+            --sidebar-width: 260px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+        
+        body { 
+            margin: 0; 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background-color: var(--bg-main); 
+            color: var(--text-primary); 
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .page-container { display: grid; grid-template-columns: var(--sidebar-width) 1fr; min-height: 100vh; }
+        
+        .sidebar { background-color: var(--bg-sidebar); border-right: 1px solid var(--border-color); padding: 1.5rem 1rem; display: flex; flex-direction: column; position: fixed; left: 0; top: 0; height: 100%; width: var(--sidebar-width); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000; }
+        .sidebar-header { display: flex; align-items: center; margin-bottom: 2.5rem; padding: 0 0.5rem; color: var(--text-primary); text-decoration: none; transition: color 0.3s; }
+        .sidebar-header:hover { color: var(--primary-color); }
+        .logo-icon { width: 32px; height: 32px; flex-shrink: 0; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .sidebar-header:hover .logo-icon { transform: rotate(-10deg) scale(1.05); filter: drop-shadow(0 0 10px var(--primary-glow)); }
+        .logo-text { font-size: 1.5rem; font-weight: 700; margin-left: 1rem; white-space: nowrap; }
+        .nav-menu { list-style: none; padding: 0; margin: 0; flex-grow: 1; }
+        .nav-item a { display: flex; align-items: center; padding: 0.8rem 1rem; color: var(--text-secondary); text-decoration: none; border-radius: 8px; margin-bottom: 0.5rem; transition: background-color 0.2s, color 0.2s, transform 0.2s; font-weight: 500; }
+        .nav-item a:hover { background-color: rgba(255, 255, 255, 0.05); color: var(--text-primary); transform: translateX(4px); }
+        .nav-item.active a { background: linear-gradient(90deg, var(--primary-color), #5b21b6); color: var(--text-primary); font-weight: 600; box-shadow: 0 4px 15px -3px var(--primary-glow); }
+        .nav-icon { width: 24px; height: 24px; margin-right: 1.25rem; flex-shrink: 0; }
+        .user-profile { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border-color); }
+        #logout-button { background: none; border: none; color: var(--text-secondary); width: 100%; padding: 1rem; display: flex; align-items: center; text-align: left; font-size: 1rem; cursor: pointer; border-radius: 8px; font-weight: 500; transition: background-color 0.2s, color 0.2s; }
+        #logout-button:hover { background-color: rgba(239, 68, 68, 0.1); color: var(--danger-color); }
+        
+        .main-content { padding: 2.5rem; grid-column: 2 / 3; animation: content-fade-in 0.8s cubic-bezier(0.215, 0.610, 0.355, 1); background-image: radial-gradient(circle at 100% 0%, rgba(147, 51, 234, 0.1), transparent 35%);}
+        @keyframes content-fade-in { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); }
+        .page-header h1 { font-size: 2.5rem; font-weight: 800; margin: 0; letter-spacing: -0.025em; }
+
+        .settings-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; max-width: 700px; margin: 0 auto; }
+        
+        .settings-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: box-shadow 0.3s ease, border-color 0.3s ease;
+            overflow: hidden;
+        }
+        .settings-card:hover {
+            box-shadow: 0 10px 35px rgba(0,0,0,0.3), 0 0 30px -5px var(--primary-glow);
+            border-color: rgba(147, 51, 234, 0.6);
+        }
+        
+        .card-header { padding: 1.5rem 2rem; border-bottom: 1px solid var(--border-color); }
+        .card-header h3 { margin: 0; font-size: 1.25rem; font-weight: 600; color: var(--text-primary); }
+        
+        .card-body { padding: 2rem; display: flex; flex-direction: column; gap: 1.75rem; }
+        
+        .form-group { position: relative; }
+        .form-group label { display: block; font-weight: 500; margin-bottom: 0.75rem; color: var(--text-secondary); font-size: 0.9rem;}
+        .form-group input { width: 100%; padding: 0.875rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; font-size: 1rem; background-color: var(--bg-input); color: var(--text-primary); transition: all 0.2s ease; }
+        .form-group input:focus { outline: none; border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--primary-glow); }
+        .form-group input:disabled { background-color: rgba(30, 41, 59, 0.5); cursor: not-allowed; opacity: 0.7; }
+
+        .card-footer { padding: 1.25rem 2rem; border-top: 1px solid var(--border-color); background-color: rgba(15, 23, 42, 0.5); display: flex; justify-content: flex-end; align-items: center; gap: 1rem; }
+        
+        #form-status { font-weight: 500; transition: opacity 0.3s ease; opacity: 0; }
+        #form-status.visible { opacity: 1; }
+        #form-status.success { color: var(--success-color); }
+        #form-status.error { color: var(--danger-color); }
+
+        .btn { padding: 0.75rem 1.5rem; font-size: 0.95rem; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; transition: all 0.2s ease-out; }
+        
+        .btn-primary { background-image: linear-gradient(120deg, var(--primary-color) 0%, #5b21b6 100%); background-size: 200% 100%; color: white; box-shadow: 0 4px 15px -5px var(--primary-glow); }
+        .btn-primary:hover { transform: translateY(-3px); background-position: 100% 0; box-shadow: 0 8px 20px -5px var(--primary-glow); }
+        .btn-primary:active { transform: translateY(-1px); }
+        .btn-primary:disabled { background-image: none; background-color: var(--text-secondary); cursor: not-allowed; transform: none; box-shadow: none; opacity: 0.5; }
+        
+        .sidebar-toggle { display: none; background: none; border: none; cursor: pointer; padding: 0.5rem; color: var(--text-secondary); border-radius: 8px; transition: color 0.2s, background-color 0.2s; z-index: 1001; }
+        .sidebar-toggle:hover { color: var(--text-primary); background-color: rgba(255, 255, 255, 0.1); }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 999; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
+        @media (max-width: 992px) { .page-container { grid-template-columns: 1fr; } .sidebar { transform: translateX(-100%); } body.sidebar-open .sidebar { transform: translateX(0); } .main-content { grid-column: 1 / 2; padding: 1.5rem; } .page-header h1 { font-size: 2rem; } .sidebar-toggle { display: block; } body.sidebar-open .overlay { opacity: 1; visibility: visible; } }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <aside class="sidebar">
+            <a href="/wallet/" class="sidebar-header"><svg class="logo-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path></svg><span class="logo-text">SCR</span></a>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="/wallet/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg></span><span class="nav-text">Гаманець</span></a></li>
+                <li class="nav-item"><a href="/transactions/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></span><span class="nav-text">Транзакції</span></a></li>
+                <li class="nav-item"><a href="/rates/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg></span><span class="nav-text">Курси</span></a></li>
+                <li class="nav-item active"><a href="/settings/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></span><span class="nav-text">Налаштування</span></a></li>
+            </ul>
+            <div class="user-profile"><button id="logout-button" title="Вийти з акаунту"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></span><span class="nav-text">Вийти</span></button></div>
+        </aside>
+        <main class="main-content">
+            <header class="page-header"><h1>Налаштування</h1><button class="sidebar-toggle"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button></header>
+            <div class="settings-grid">
+                <form id="profile-form" class="settings-card"><div class="card-header"><h3>Профіль</h3></div><div class="card-body"><div class="form-group"><label for="full-name-input">Повне ім'я</label><input type="text" id="full-name-input" placeholder="Ваше ім'я"></div><div class="form-group"><label for="email-input">Електронна пошта</label><input type="email" id="email-input" disabled></div></div><div class="card-footer"><span id="form-status"></span><button type="submit" class="btn btn-primary">Зберегти зміни</button></div></form>
+            </div>
+        </main>
+    </div>
+    <div class="overlay"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = netlifyIdentity.currentUser(); if (!user) { window.location.href = '/'; return; }
+            const logoutButton = document.getElementById('logout-button'); logoutButton.addEventListener('click', () => netlifyIdentity.logout()); netlifyIdentity.on('logout', () => window.location.href = '/');
+            const sidebarToggle = document.querySelector('.sidebar-toggle'); const overlay = document.querySelector('.overlay'); const toggleSidebar = () => document.body.classList.toggle('sidebar-open'); sidebarToggle.addEventListener('click', toggleSidebar); overlay.addEventListener('click', toggleSidebar);
+            
+            const profileForm = document.getElementById('profile-form'); const fullNameInput = document.getElementById('full-name-input'); const emailInput = document.getElementById('email-input'); const formStatus = document.getElementById('form-status');
+            
+            emailInput.value = user.email || ''; fullNameInput.value = user.user_metadata.full_name || '';
+            
+            profileForm.addEventListener('submit', async (e) => {
+                e.preventDefault(); const submitButton = profileForm.querySelector('button[type="submit"]'); const newName = fullNameInput.value;
+                formStatus.textContent = 'Збереження...'; formStatus.className = 'visible'; submitButton.disabled = true;
+                
+                try {
+                    const updatedUser = await user.update({ data: { full_name: newName } });
+                    fullNameInput.value = updatedUser.user_metadata.full_name;
+                    formStatus.textContent = 'Збережено успішно!'; formStatus.className = 'visible success';
+                } catch (error) { 
+                    console.error("Помилка оновлення профілю:", error); 
+                    formStatus.textContent = 'Помилка збереження.'; 
+                    formStatus.className = 'visible error'; 
+                } finally { 
+                    submitButton.disabled = false; 
+                    setTimeout(() => { formStatus.textContent = ''; formStatus.className = ''; }, 3000); 
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вхід - SCR Project</title>
+
+    <!-- Підключення шрифту Inter для сучасного вигляду -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- ==== ОНОВЛЕНІ СТИЛІ ==== -->
+    <style>
+        :root {
+            /* Основна палітра кольорів */
+            --primary-color: #8b5cf6; /* Фіолетовий */
+            --secondary-color: #3b82f6; /* Синій */
+            --primary-glow: rgba(139, 92, 246, 0.5);
+            --secondary-glow: rgba(59, 130, 246, 0.4);
+
+            /* Фонові кольори */
+            --bg-dark: #0f172a; /* Темно-синій */
+            --bg-light: #1e293b; /* Світліший синій */
+            
+            /* Кольори тексту */
+            --text-light: #f1f5f9; /* Майже білий */
+            --text-muted: #94a3b8; /* Сірий */
+
+            /* Кольори рамки та картки */
+            --card-bg: rgba(30, 41, 59, 0.6);
+            --border-color: rgba(148, 163, 184, 0.2);
+            --border-hover: rgba(139, 92, 246, 0.7);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            display: grid;
+            place-items: center;
+            height: 100vh;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Анімований фон */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 15% 25%, var(--primary-glow), transparent 40%),
+                radial-gradient(circle at 85% 75%, var(--secondary-glow), transparent 40%);
+            animation: background-pan 25s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes background-pan {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+
+        /* Контейнер форми входу */
+        .login-container {
+            position: relative;
+            background-color: var(--card-bg);
+            padding: 48px 40px;
+            border-radius: 24px;
+            text-align: center;
+            max-width: 420px;
+            width: 95%;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            z-index: 1;
+            
+            /* Градієнтна рамка */
+            border: 1px solid transparent;
+            background-clip: padding-box;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4), 
+                        inset 0 0 1px 1px var(--border-color);
+
+            animation: fade-in-up 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        
+        @keyframes fade-in-up {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Логотип */
+        .logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            color: var(--text-light);
+        }
+
+        .logo-icon { 
+            width: 48px; 
+            height: 48px; 
+            transition: transform 0.4s ease, color 0.4s ease, filter 0.4s ease;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.1));
+        }
+
+        .logo:hover .logo-icon {
+            transform: rotate(-12deg) scale(1.1);
+            color: var(--primary-color);
+            filter: drop-shadow(0 0 15px var(--primary-glow));
+        }
+
+        .logo h1 { 
+            font-size: 3.5rem; 
+            margin: 0; 
+            font-weight: 800;
+            text-shadow: 0 0 10px rgba(241, 245, 249, 0.1), 0 0 25px var(--primary-glow);
+            transition: text-shadow 0.4s ease;
+        }
+        
+        .logo:hover h1 {
+            text-shadow: 0 0 10px rgba(241, 245, 249, 0.3), 0 0 35px var(--primary-glow);
+        }
+
+        /* Описовий текст */
+        .login-container p { 
+            color: var(--text-muted); 
+            line-height: 1.7; 
+            font-size: 1.1rem; 
+            margin-bottom: 32px; 
+            max-width: 320px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Кнопка входу */
+        #login-button {
+            width: 100%;
+            border-radius: 12px;
+            background-color: var(--primary-color);
+            background-image: linear-gradient(120deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            background-size: 200% 100%;
+            color: white;
+            padding: 16px 20px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        #login-button:hover {
+            transform: translateY(-4px);
+            background-position: 100% 0;
+            box-shadow: 0 10px 25px -5px var(--primary-glow), 0 5px 10px -6px var(--secondary-glow);
+        }
+
+        #login-button:active {
+            transform: translateY(-1px) scale(0.99);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        /* Статус повідомлення */
+        #status { 
+            margin-top: 24px; 
+            font-weight: 500; 
+            min-height: 20px; 
+            color: var(--text-muted); 
+            transition: color 0.3s ease;
+        }
+    </style>
+    <!-- ==== КІНЕЦЬ ОНОВЛЕНИХ СТИЛІВ ==== -->
+
+    <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+</head>
+<body>
+
+    <div class="login-container">
+        <div class="logo">
+             <svg class="logo-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path></svg>
+            <h1>SCR</h1>
+        </div>
+        <p>Ваш надійний крипто-гаманець. Увійдіть, щоб продовжити.</p>
+        
+        <button id="login-button">Увійти або Зареєструватися</button>
+
+        <p id="status"></p>
+    </div>
+
+    <script>
+        // СКРИПТ ДЛЯ IFRAME (БЕЗ ЗМІН)
+        let iframeObserver = null;
+        netlifyIdentity.on('open', () => {
+            setTimeout(() => {
+                const iframe = document.getElementById('netlify-identity-widget');
+                if (!iframe) { return; }
+                const iframeDoc = iframe.contentDocument;
+                if (!iframeDoc) return;
+                const hideCallout = () => {
+                    const callout = iframeDoc.querySelector('.callout');
+                    if (callout) { callout.style.display = 'none'; }
+                };
+                hideCallout();
+                iframeObserver = new MutationObserver(hideCallout);
+                iframeObserver.observe(iframeDoc.body, { childList: true, subtree: true });
+            }, 50);
+        });
+        netlifyIdentity.on('close', () => {
+            if (iframeObserver) { iframeObserver.disconnect(); iframeObserver = null; }
+        });
+
+        // ===================================================================
+        // ПОВНІСТЮ ПЕРЕРОБЛЕНА ТА ВИПРАВЛЕНА ЛОГІКА ПЕРЕНАПРАВЛЕННЯ
+        // ===================================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            const statusEl = document.getElementById('status');
+            const loginButton = document.getElementById('login-button');
+
+            // Універсальна функція для перенаправлення
+            const handleUser = (user) => {
+                if (user) {
+                    // Якщо користувач існує, негайно перенаправляємо
+                    loginButton.disabled = true;
+                    statusEl.textContent = 'Ви вже увійшли. Перенаправлення...';
+                    
+                    // window.location.replace - краще, ніж .href, бо не створює запис в історії браузера
+                    window.location.replace('/wallet/');
+                }
+            };
+
+            // Подія 'init' спрацьовує, коли віджет завантажився і знає, чи авторизований користувач.
+            // Це найнадійніший спосіб перевірки.
+            netlifyIdentity.on('init', user => {
+                handleUser(user);
+            });
+            
+            // Подія 'login' спрацьовує, коли користувач щойно успішно увійшов.
+            netlifyIdentity.on('login', user => {
+                netlifyIdentity.close();
+                handleUser(user);
+            });
+
+            // Натискання на кнопку для неавторизованих користувачів
+            loginButton.addEventListener('click', () => {
+                const user = netlifyIdentity.currentUser();
+                // Додаткова перевірка: якщо раптом користувач вже є, перекидуємо, а не відкриваємо вікно.
+                if (user) {
+                    handleUser(user);
+                } else {
+                    netlifyIdentity.open(); 
+                }
+            });
+
+            netlifyIdentity.on('error', err => {
+                console.error('Помилка Netlify Identity:', err);
+                statusEl.textContent = 'Виникла помилка під час авторизації.';
+            });
+        });
+    </script>
+</body>
+</html>
