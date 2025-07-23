@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Гаманець - SCR</title>
     
-    <!-- Використовую ваш Client ID, як ви просили -->
 <script src="https://www.paypal.com/sdk/js?client-id=ASJIOL6y24xuwQiCC-a8RBkVypAp5VuYLf7cXEIzc4aLV5yYEXDVvellq-OGQQfZjkqJBZh1h0JqS9mU&currency=USD"></script>
     
     <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
@@ -185,20 +184,18 @@
                     paymentStatus.textContent = 'Обробка платежу...';
                     
                     // ==========================================================
-                    // ОСЬ ВИПРАВЛЕННЯ: Звертаємось до правильного ендпоінту
+                    // ВИКОРИСТОВУЄМО ПРЯМИЙ ШЛЯХ, ЯКИЙ ПРАЦЮЄ У ВАШОМУ ПРОЄКТІ
                     // ==========================================================
-                    return fetch('/api/update-balance', {
+                    return fetch('/.netlify/functions/update-balance', {
                         method: 'POST',
                         headers: {
                             'Authorization': `Bearer ${user.token.access_token}`,
-                            // Надсилаємо orderID у тілі запиту
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({ orderID: data.orderID })
                     })
                     .then(res => {
                         if (!res.ok) {
-                             // Якщо сервер відповів помилкою, створюємо свою помилку з текстом статусу
                             throw new Error(`Сервер відповів зі статусом ${res.status}`);
                         }
                         return res.json();
