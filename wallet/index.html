@@ -22,51 +22,24 @@
 
     <style>
         :root {
-            --primary-color: #9333ea;
-            --primary-glow: rgba(147, 51, 234, 0.4);
-            --danger-color: #ef4444;
-            --bg-main: #020617;
-            --bg-sidebar: rgba(12, 19, 34, 0.85);
-            --bg-header: rgba(2, 6, 23, 0.7);
-            --bg-card: rgba(15, 23, 42, 0.55);
-            --bg-card-secondary: rgba(51, 65, 85, 0.4);
-            --bg-card-secondary-hover: rgba(51, 65, 85, 0.7);
-            --bg-overlay: rgba(0, 0, 0, 0.7);
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --border-color: rgba(51, 65, 85, 0.5);
-            --shadow-color: rgba(0, 0, 0, 0.3);
-            --sidebar-width-expanded: 260px;
-            --sidebar-width-collapsed: 88px;
+            --primary-color: #9333ea; --primary-glow: rgba(147, 51, 234, 0.4); --danger-color: #ef4444; --bg-main: #020617; --bg-sidebar: rgba(12, 19, 34, 0.85); --bg-header: rgba(2, 6, 23, 0.7); --bg-card: rgba(15, 23, 42, 0.55); --bg-card-secondary: rgba(51, 65, 85, 0.4); --bg-card-secondary-hover: rgba(51, 65, 85, 0.7); --bg-overlay: rgba(0, 0, 0, 0.7); --text-primary: #f8fafc; --text-secondary: #94a3b8; --border-color: rgba(51, 65, 85, 0.5); --shadow-color: rgba(0, 0, 0, 0.3); --sidebar-width-expanded: 260px; --sidebar-width-collapsed: 88px;
         }
-
         html.light-theme {
-            --primary-color: #8b5cf6;
-            --primary-glow: rgba(139, 92, 246, 0.3);
-            --danger-color: #dc2626;
-            --bg-main: #f1f5f9;
-            --bg-sidebar: rgba(255, 255, 255, 0.8);
-            --bg-header: rgba(255, 255, 255, 0.7);
-            --bg-card: #ffffff;
-            --bg-card-secondary: #e2e8f0;
-            --bg-card-secondary-hover: #cbd5e1;
-            --bg-overlay: rgba(2, 6, 23, 0.6);
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --border-color: #e2e8f0;
-            --shadow-color: rgba(45, 55, 72, 0.1);
+            --primary-color: #8b5cf6; --primary-glow: rgba(139, 92, 246, 0.3); --danger-color: #dc2626; --bg-main: #f1f5f9; --bg-sidebar: rgba(255, 255, 255, 0.8); --bg-header: rgba(255, 255, 255, 0.7); --bg-card: #ffffff; --bg-card-secondary: #e2e8f0; --bg-card-secondary-hover: #cbd5e1; --bg-overlay: rgba(2, 6, 23, 0.6); --text-primary: #1e293b; --text-secondary: #64748b; --border-color: #e2e8f0; --shadow-color: rgba(45, 55, 72, 0.1);
         }
-
         *, ::after, ::before { box-sizing: border-box; }
-
         body, html { margin: 0; font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: var(--text-primary); overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
-        .background-glow { position: fixed; top: 50%; left: 50%; width: 1200px; height: 1200px; background: radial-gradient(circle, rgba(147, 51, 234, 0.15) 0%, transparent 40%); transform: translate(-50%, -50%); animation: aurora-glow 25s cubic-bezier(0.4, 0, 0.6, 1) infinite; z-index: -1; filter: blur(100px); }
-        @keyframes aurora-glow { 0% { transform: translate(-50%, -50%) rotate(0deg) scale(1); } 50% { transform: translate(-50%, -50%) rotate(180deg) scale(1.3); } 100% { transform: translate(-50%, -50%) rotate(360deg) scale(1); } }
         .page-container { display: grid; grid-template-columns: var(--sidebar-width-expanded) 1fr; min-height: 100vh; transition: grid-template-columns 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .sidebar { background-color: var(--bg-sidebar); backdrop-filter: blur(10px); border-right: 1px solid var(--border-color); padding: 1.5rem; display: flex; flex-direction: column; position: fixed; left: 0; top: 0; height: 100%; width: var(--sidebar-width-expanded); z-index: 1000; transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s, border-color 0.3s; }
-        .sidebar-header { display: flex; align-items: center; margin-bottom: 2.5rem; color: var(--text-primary); text-decoration: none; transition: color .3s; min-height: 32px; }
-        .logo-icon { width: 32px; height: 32px; flex-shrink: 0; transition: transform .4s cubic-bezier(.175, .885, .32, 1.275); }
+        .sidebar { background-color: var(--bg-sidebar); backdrop-filter: blur(10px); border-right: 1px solid var(--border-color); padding: 1.5rem; display: flex; flex-direction: column; position: fixed; left: 0; top: 0; height: 100%; width: var(--sidebar-width-expanded); z-index: 1100; transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s, border-color 0.3s; }
+        
+        /* НОВА АНІМАЦІЯ ЛОГО */
+        .sidebar-header { display: flex; align-items: center; margin-bottom: 2.5rem; color: var(--text-primary); text-decoration: none; min-height: 32px; perspective: 800px; position: relative; overflow: hidden; }
+        .sidebar-header .logo-icon { transition: transform .5s cubic-bezier(.25, .46, .45, .94); }
+        .sidebar-header:hover .logo-icon { transform: rotateY(25deg) scale(1.1); }
+        .sidebar-header::after { content: ''; position: absolute; top: -50%; left: -60%; width: 20%; height: 200%; background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%); transform: rotate(25deg); transition: transform .6s cubic-bezier(.23, 1, .32, 1); }
+        .sidebar-header:hover::after { transform: rotate(25deg) translate(300px, 0); }
         .logo-text { font-size: 1.5rem; font-weight: 700; margin-left: 1rem; white-space: nowrap; transition: opacity 0.3s ease, width 0.3s ease; }
+        
         .nav-menu { list-style: none; padding: 0; margin: 0; flex-grow: 1; }
         .nav-item a { display: flex; align-items: center; padding: .8rem 1rem; color: var(--text-secondary); text-decoration: none; border-radius: 8px; margin-bottom: .5rem; transition: all .2s; font-weight: 500; height: 48px; }
         .nav-item a:hover { background-color: rgba(147, 51, 234, .07); color: var(--text-primary); }
@@ -84,8 +57,13 @@
         body.sidebar-collapsed .nav-item a, body.sidebar-collapsed .footer-btn { justify-content: center; padding: 0.8rem; }
         body.sidebar-collapsed .nav-icon { margin-right: 0; }
         body.sidebar-collapsed .collapse-btn svg { transform: rotate(180deg); }
-        .page-header { position: sticky; top: 0; grid-column: 2 / 3; display: flex; justify-content: space-between; align-items: center; padding: 1rem 2.5rem; height: 72px; z-index: 900; background-color: var(--bg-header); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); transition: background-color 0.3s, border-color 0.3s; }
+        
+        .page-header { position: sticky; top: 0; grid-column: 2 / 3; display: flex; justify-content: space-between; align-items: center; padding: 1rem 2.5rem; height: 72px; z-index: 1000; background-color: var(--bg-header); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); transition: background-color 0.3s, border-color 0.3s; }
+        /* ОНОВЛЕНИЙ ХЕДЕР ДЛЯ МОБІЛЬНИХ */
+        .header-left { display: none; align-items: center; gap: 0.75rem; }
+        .logo-icon-header { width: 28px; height: 28px; color: var(--primary-color); }
         .page-header h1 { font-size: clamp(1.5rem, 4vw, 1.75rem); font-weight: 700; margin: 0; }
+        
         .main-content { grid-column: 2 / 3; animation: content-fade-in .8s .2s both; }
         @keyframes content-fade-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .dashboard-grid { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: calc(100vh - 72px); padding: 2rem; }
@@ -99,13 +77,12 @@
         .action-buttons { display: grid; grid-template-columns: 1fr; gap: 1rem; animation: fade-in-up 0.8s 1.4s both; }
         @media (min-width: 480px) { .action-buttons { grid-template-columns: 1fr 1fr; gap: 1.5rem; } }
         .btn { display: flex; align-items: center; justify-content: center; gap: 0.75rem; padding: 1rem; font-size: 1rem; font-weight: 600; border-radius: 16px; border: 1px solid transparent; cursor: pointer; transition: all .25s ease-out; }
-        .btn svg { width: 20px; height: 20px; }
         .btn-primary { background-image: linear-gradient(120deg, var(--primary-color) 0%, #8b5cf6 100%); color: white; box-shadow: 0 4px 15px -5px var(--primary-glow); }
         .btn-primary:hover { transform: translateY(-4px); box-shadow: 0 8px 25px -5px var(--primary-glow); }
         .btn-secondary { background-color: var(--bg-card-secondary); color: var(--text-secondary); border-color: var(--border-color); }
         .btn-secondary:hover { background-color: var(--bg-card-secondary-hover); color: var(--text-primary); transform: translateY(-4px); }
         @keyframes fade-in-up { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        .modal-overlay { z-index: 2000; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-overlay); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: opacity .4s ease, visibility .4s ease; }
+        .modal-overlay { z-index: 1200; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-overlay); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: opacity .4s ease, visibility .4s ease; }
         .modal-overlay.visible { opacity: 1; visibility: visible; }
         .modal-content { background-color: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 20px; box-shadow: 0 8px 32px var(--shadow-color); padding: 2rem; width: 90%; max-width: 400px; transform: scale(.95); transition: transform .4s cubic-bezier(0.4, 0, 0.2, 1); }
         .modal-overlay.visible .modal-content { transform: scale(1); }
@@ -115,7 +92,8 @@
         #amount-form label { display: block; margin-bottom: .5rem; color: var(--text-secondary); }
         #amount-form input { background-color: var(--bg-main); width: 100%; padding: .75rem; font-size: 1.25rem; border-radius: 8px; border: 1px solid var(--border-color); color: var(--text-primary); margin-bottom: 1rem; }
         .hidden { display: none; }
-        .sidebar-toggle { display: none; background: transparent; border: none; cursor: pointer; padding: 0.5rem; width: 44px; height: 44px; z-index: 1001; }
+        
+        .sidebar-toggle { display: none; background: transparent; border: none; cursor: pointer; padding: 0.5rem; width: 44px; height: 44px; z-index: 1101; }
         .hamburger { position: relative; width: 24px; height: 20px; }
         .hamburger .line { position: absolute; left: 0; width: 100%; height: 2px; background-color: var(--text-primary); border-radius: 2px; transition: transform 0.3s ease-out, opacity 0.3s ease-out, background-color 0.3s; }
         .hamburger .line-1 { top: 0; }
@@ -124,11 +102,26 @@
         body.sidebar-open .hamburger .line-1 { transform: translateY(9px) rotate(45deg); }
         body.sidebar-open .hamburger .line-2 { opacity: 0; }
         body.sidebar-open .hamburger .line-3 { transform: translateY(-9px) rotate(-45deg); }
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(2, 6, 23, 0.6); backdrop-filter: blur(5px); z-index: 999; opacity: 0; visibility: hidden; transition: opacity 0.4s ease, visibility 0.4s ease; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(2, 6, 23, 0.6); backdrop-filter: blur(5px); z-index: 1099; opacity: 0; visibility: hidden; transition: opacity 0.4s ease, visibility 0.4s ease; }
         #theme-toggle-btn .icon { width: 24px; height: 24px; }
         html.light-theme #theme-toggle-btn .icon-moon { display: none; }
         html:not(.light-theme) #theme-toggle-btn .icon-sun { display: none; }
-        @media (max-width: 992px) { .page-container, body.sidebar-collapsed .page-container { grid-template-columns: 1fr; } .sidebar { transform: translateX(-100%); } body.sidebar-open .sidebar { transform: translateX(0); } .page-header, .main-content { grid-column: 1 / 2; } .page-header { padding: 1rem 1.5rem; } .sidebar-toggle { display: block; } body.sidebar-open .overlay { opacity: 1; visibility: visible; } .dashboard-grid { padding: 1.5rem; } .collapse-btn { display: none; } }
+        
+        @media (max-width: 992px) {
+            .page-container, body.sidebar-collapsed .page-container { grid-template-columns: 1fr; }
+            .sidebar { transform: translateX(-100%); }
+            body.sidebar-open .sidebar { transform: translateX(0); }
+            .page-header, .main-content { grid-column: 1 / 2; }
+            .page-header { padding: 1rem 1.5rem; }
+            .page-header .header-left { display: flex; }
+            .page-header h1 { display: none; }
+            @media (min-width: 400px) { .page-header h1 { display: block; } }
+            .sidebar-toggle { display: block; }
+            body.sidebar-open .overlay { opacity: 1; visibility: visible; }
+            .main-content { padding: 1.5rem; }
+            .dashboard-grid { padding: 1.5rem; }
+            .collapse-btn { display: none; }
+        }
     </style>
 </head>
 <body>
@@ -165,7 +158,10 @@
         </aside>
 
         <header class="page-header">
-            <h1>Гаманець</h1>
+            <div class="header-left">
+                <svg class="logo-icon-header" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path></svg>
+                <h1>Гаманець</h1>
+            </div>
             <button class="sidebar-toggle">
                 <div class="hamburger">
                     <span class="line line-1"></span>
@@ -196,7 +192,6 @@
     </div>
     
     <div class="overlay"></div>
-
     <div class="modal-overlay" id="deposit-modal">
         <div class="modal-content">
             <div class="modal-header"><h3>Поповнити баланс</h3><button class="modal-close-btn" id="modal-close">×</button></div>
@@ -209,7 +204,6 @@
     document.addEventListener('DOMContentLoaded', () => {
         const user = netlifyIdentity.currentUser();
         if (!user) { window.location.replace('/'); return; }
-
         const themeToggleBtn = document.getElementById('theme-toggle-btn');
         const sidebarCollapseBtn = document.getElementById('sidebar-collapse-btn');
         const sidebarToggle = document.querySelector('.sidebar-toggle');
@@ -223,96 +217,25 @@
         const paymentStatus = depositModal.querySelector('#payment-status');
         const paypalContainer = depositModal.querySelector('#paypal-button-container');
         const logoutButton = document.getElementById('logout-button');
-
-        const handleThemeToggle = () => {
-            const isLightTheme = document.documentElement.classList.toggle('light-theme');
-            localStorage.setItem('theme', isLightTheme ? 'light' : 'dark');
-        };
+        const handleThemeToggle = () => { const isLightTheme = document.documentElement.classList.toggle('light-theme'); localStorage.setItem('theme', isLightTheme ? 'light' : 'dark'); };
         if (themeToggleBtn) { themeToggleBtn.addEventListener('click', handleThemeToggle); }
-
-        const handleSidebarCollapse = () => {
-            const isCollapsed = document.body.classList.toggle('sidebar-collapsed');
-            localStorage.setItem('sidebarState', isCollapsed ? 'collapsed' : 'expanded');
-        };
+        const handleSidebarCollapse = () => { const isCollapsed = document.body.classList.toggle('sidebar-collapsed'); localStorage.setItem('sidebarState', isCollapsed ? 'collapsed' : 'expanded'); };
         if (localStorage.getItem('sidebarState') === 'collapsed') { document.body.classList.add('sidebar-collapsed'); }
         if (sidebarCollapseBtn) { sidebarCollapseBtn.addEventListener('click', handleSidebarCollapse); }
-
         const toggleMobileSidebar = () => document.body.classList.toggle('sidebar-open');
         sidebarToggle.addEventListener('click', toggleMobileSidebar);
         overlay.addEventListener('click', toggleMobileSidebar);
-
-        const resetModalState = () => {
-            depositModal.querySelector('#modal-step-1').classList.remove('hidden');
-            depositModal.querySelector('#modal-step-2').classList.add('hidden');
-            amountInput.value = '';
-            paymentStatus.textContent = '';
-            paypalContainer.innerHTML = '';
-        };
+        const resetModalState = () => { depositModal.querySelector('#modal-step-1').classList.remove('hidden'); depositModal.querySelector('#modal-step-2').classList.add('hidden'); amountInput.value = ''; paymentStatus.textContent = ''; paypalContainer.innerHTML = ''; };
         const openModal = () => { resetModalState(); depositModal.classList.add('visible'); };
         const closeModal = () => { depositModal.classList.remove('visible'); };
         depositBtn.addEventListener('click', openModal);
         modalCloseBtn.addEventListener('click', closeModal);
         depositModal.addEventListener('click', (e) => { if (e.target === depositModal) closeModal(); });
-
         const displayBalance = (balanceValue) => { balanceAmountEl.innerHTML = `<span>${(Number(balanceValue) || 0).toFixed(2)} SCR</span>`; };
-        const loadBalance = async () => {
-            try {
-                await user.jwt(true); 
-                const latestUser = netlifyIdentity.currentUser();
-                displayBalance(latestUser?.user_metadata?.balance);
-            } catch (error) {
-                console.error("Не вдалося оновити дані користувача:", error);
-                displayBalance(user?.user_metadata?.balance);
-            }
-        };
+        const loadBalance = async () => { try { await user.jwt(true); const latestUser = netlifyIdentity.currentUser(); displayBalance(latestUser?.user_metadata?.balance); } catch (error) { console.error("Не вдалося оновити дані користувача:", error); displayBalance(user?.user_metadata?.balance); } };
         loadBalance();
-
-        amountForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const amount = amountInput.value;
-            if (amount && parseFloat(amount) >= 1) {
-                depositModal.querySelector('#modal-step-1').classList.add('hidden');
-                depositModal.querySelector('#modal-step-2').classList.remove('hidden');
-                renderPayPalButtons(amount);
-            } else {
-                alert('Будь ласка, введіть суму, що дорівнює або більша за 1 USD.');
-            }
-        });
-
-        const renderPayPalButtons = (amount) => {
-            paypalContainer.innerHTML = '';
-            paypal.Buttons({
-                createOrder: (data, actions) => actions.order.create({ purchase_units: [{ amount: { value: amount, currency_code: 'USD' } }] }),
-                onApprove: async (data, actions) => {
-                    paymentStatus.textContent = 'Перевірка платежу...';
-                    try {
-                        const response = await fetch('/.netlify/functions/update-balance', {
-                            method: 'POST',
-                            headers: { 'Authorization': `Bearer ${user.token.access_token}`, 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ orderID: data.orderID })
-                        });
-                        const result = await response.json();
-                        if (!response.ok) throw new Error(result.error || 'Помилка перевірки платежу.');
-                        paymentStatus.textContent = `Платіж успішний! Оновлюємо баланс...`;
-                        const currentUser = netlifyIdentity.currentUser();
-                        const currentBalance = Number(currentUser.user_metadata?.balance) || 0;
-                        const newBalance = currentBalance + result.amountPaid;
-                        const updatedUser = await currentUser.update({ data: { balance: newBalance } });
-                        paymentStatus.textContent = `Баланс успішно поповнено!`;
-                        displayBalance(updatedUser.user_metadata.balance);
-                        setTimeout(closeModal, 2500);
-                    } catch (err) {
-                        console.error('Помилка обробки платежу:', err);
-                        paymentStatus.textContent = `Помилка: ${err.message}`;
-                    }
-                },
-                onError: (err) => {
-                    console.error('Помилка кнопок PayPal:', err);
-                    paymentStatus.textContent = 'Виникла помилка під час ініціалізації оплати.';
-                }
-            }).render(paypalContainer);
-        };
-
+        amountForm.addEventListener('submit', (e) => { e.preventDefault(); const amount = amountInput.value; if (amount && parseFloat(amount) >= 1) { depositModal.querySelector('#modal-step-1').classList.add('hidden'); depositModal.querySelector('#modal-step-2').classList.remove('hidden'); renderPayPalButtons(amount); } else { alert('Будь ласка, введіть суму, що дорівнює або більша за 1 USD.'); } });
+        const renderPayPalButtons = (amount) => { paypalContainer.innerHTML = ''; paypal.Buttons({ createOrder: (data, actions) => actions.order.create({ purchase_units: [{ amount: { value: amount, currency_code: 'USD' } }] }), onApprove: async (data, actions) => { paymentStatus.textContent = 'Перевірка платежу...'; try { const response = await fetch('/.netlify/functions/update-balance', { method: 'POST', headers: { 'Authorization': `Bearer ${user.token.access_token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ orderID: data.orderID }) }); const result = await response.json(); if (!response.ok) throw new Error(result.error || 'Помилка перевірки платежу.'); paymentStatus.textContent = `Платіж успішний! Оновлюємо баланс...`; const currentUser = netlifyIdentity.currentUser(); const currentBalance = Number(currentUser.user_metadata?.balance) || 0; const newBalance = currentBalance + result.amountPaid; const updatedUser = await currentUser.update({ data: { balance: newBalance } }); paymentStatus.textContent = `Баланс успішно поповнено!`; displayBalance(updatedUser.user_metadata.balance); setTimeout(closeModal, 2500); } catch (err) { console.error('Помилка обробки платежу:', err); paymentStatus.textContent = `Помилка: ${err.message}`; } }, onError: (err) => { console.error('Помилка кнопок PayPal:', err); paymentStatus.textContent = 'Виникла помилка під час ініціалізації оплати.'; } }).render(paypalContainer); };
         logoutButton.addEventListener('click', () => netlifyIdentity.logout());
         netlifyIdentity.on('logout', () => window.location.replace('/'));
     });
