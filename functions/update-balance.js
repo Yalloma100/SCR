@@ -51,10 +51,14 @@ exports.handler = async (event, context) => {
         const amountPaid = parseFloat(orderData.purchase_units[0].amount.value);
         console.log(`Платіж успішний. Сума: ${amountPaid} USD`);
 
-        // ДІАГНОСТИЧНА ЗМІНА: Читаємо з user_metadata
-        const currentBalance = user.user_metadata.balance || 0;
-        const newBalance = currentBalance + amountPaid;
-        console.log(`Оновлення балансу (в user_metadata): з ${currentBalance} на ${newBalance}`);
+        // Створюємо об'єкт, який хочемо зберегти
+        const dataToSave = {
+            name: user.user_metadata.full_name || "user", // Беремо поточне ім'я або стандартне
+            balance: (user.user_metadata.balance || 0) + amountPaid
+        };
+        const newBalance = dataToSave.balance;
+
+        console.log(`Спроба записати в full_name: ${JSON.stringify(dataToSave)}`);
 
         const netlifyAPIUrl = `https://api.netlify.com/api/v1/users/${userId}`;
         
@@ -65,10 +69,11 @@ exports.handler = async (event, context) => {
                 'Content-Type': 'application/json' 
             },
             body: JSON.stringify({
-                // ДІАГНОСТИЧНА ЗМІНА: Записуємо в user_metadata, зберігаючи існуючі дані
+                // !! ГОЛОВНА ДІАГНОСТИЧНА ЗМІНА !!
+                // Ми перезаписуємо поле full_name рядком, що містить JSON
                 user_metadata: { 
-                    ...user.user_metadata, 
-                    balance: newBalance 
+                    ...user.user_metadata,
+                    full_name: JSON.stringify(dataToSave)
                 } 
             })
         });
@@ -79,7 +84,7 @@ exports.handler = async (event, context) => {
             throw new Error(`Не вдалося оновити баланс. Відповідь Netlify: ${JSON.stringify(errorBody)}`);
         }
         
-        console.log("Баланс користувача в Netlify (user_metadata) успішно оновлено.");
+        console.log("Дані користувача (в полі full_name) успішно оновлено.");
 
         return {
             statusCode: 200,
