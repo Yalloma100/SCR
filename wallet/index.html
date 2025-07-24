@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Гаманець - SCR</title>
     
+    <!-- ==================================================================================================== -->
+    <!-- ПРАВИЛЬНИЙ СКРИПТ PAYPAL. ЗАМІНІТЬ YOUR_SANDBOX_CLIENT_ID на ваш реальний Client ID -->
+    <!-- ==================================================================================================== -->
 <script src="https://www.paypal.com/sdk/js?client-id=ASJIOL6y24xuwQiCC-a8RBkVypAp5VuYLf7cXEIzc4aLV5yYEXDVvellq-OGQQfZjkqJBZh1h0JqS9mU&currency=USD"></script>
     
     <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
@@ -137,6 +140,7 @@
         
         loadBalance();
 
+        // ... (код для керування модальним вікном залишається без змін) ...
         const depositBtn = document.getElementById('deposit-btn');
         const depositModal = document.getElementById('deposit-modal');
         const modalCloseBtn = document.getElementById('modal-close');
@@ -183,9 +187,7 @@
                 onApprove: (data, actions) => {
                     paymentStatus.textContent = 'Обробка платежу...';
                     
-                    // ==========================================================
-                    // ВИКОРИСТОВУЄМО ПРЯМИЙ ШЛЯХ, ЯКИЙ ПРАЦЮЄ У ВАШОМУ ПРОЄКТІ
-                    // ==========================================================
+                    // Використовуємо прямий шлях до функції, який у вас працює
                     return fetch('/.netlify/functions/update-balance', {
                         method: 'POST',
                         headers: {
