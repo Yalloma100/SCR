@@ -2,10 +2,12 @@
 
 const fetch = require('node-fetch');
 
-const PAYPAL_CLIENT_ID     = "ASJIOL6y24xuwQiCC-a8RBkVypAp5VuYLf7cXEIzc4aLV5yYEXDVvellq-OGQQfZjkqJBZh1h0JqS9mU";
-const PAYPAL_CLIENT_SECRET = "EJ4fJwwhV6PIVwQBJkvXSPRf8OWm6sVLYPXgQpqr4_GuMN_PIaaDpevPGg4AR-VlRu2Uly7x4NmsdGeY";
+const PAYPAL_CLIENT_ID     = process.env.PAYPAL_CLIENT_ID;
+const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET;
+const NETLIFY_API_TOKEN    = process.env.NETLIFY_API_TOKEN; // Отримуємо токен з середовища
+const NETLIFY_SITE_URL     = process.env.URL; // URL вашого сайту
 
-// Функція для отримання токена PayPal залишається без змін
+// Функція для отримання токена PayPal (без змін)
 async function getPaypalAccessToken(clientId, clientSecret) {
     const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
     const response = await fetch('https://api.sandbox.paypal.com/v1/oauth2/token', {
@@ -22,8 +24,9 @@ async function getPaypalAccessToken(clientId, clientSecret) {
 }
 
 exports.handler = async (event, context) => {
-    // Перевіряємо, чи авторизований користувач
-    if (!context.clientContext.user) {
+    // 1. Перевіряємо, чи авторизований користувач
+    const { user } = context.clientContext;
+    if (!user) {
         return { statusCode: 401, body: JSON.stringify({ error: 'Ви не авторизовані.' }) };
     }
 
@@ -32,30 +35,61 @@ exports.handler = async (event, context) => {
         if (!orderID) {
             return { statusCode: 400, body: JSON.stringify({ error: 'Відсутній ID замовлення.' }) };
         }
-        
-        // Перевіряємо платіж PayPal
+
+        // 2. Перевіряємо платіж PayPal (без змін)
         const paypalToken = await getPaypalAccessToken(PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET);
         const orderResponse = await fetch(`https://api.sandbox.paypal.com/v2/checkout/orders/${orderID}`, {
             headers: { 'Authorization': `Bearer ${paypalToken}` }
         });
-        
         const orderData = await orderResponse.json();
+
         if (orderData.status !== 'COMPLETED' && orderData.status !== 'APPROVED') {
             return { statusCode: 400, body: JSON.stringify({ error: `Статус платежу не є успішним: ${orderData.status}` }) };
         }
 
-        // Отримуємо сплачену суму
         const amountPaid = parseFloat(orderData.purchase_units[0].amount.value);
-        console.log(`Платіж успішний. Сума: ${amountPaid} USD`);
+        
+        // 3. Отримуємо повні дані користувача через адмін-API
+        const adminUrl = `${NETLIFY_SITE_URL}/.netlify/identity/admin/users/${user.sub}`;
+        const userResponse = await fetch(adminUrl, {
+            headers: { 'Authorization': `Bearer ${NETLIFY_API_TOKEN}` }
+        });
+        if (!userResponse.ok) throw new Error("Не вдалося отримати дані користувача.");
+        
+        const userData = await userResponse.json();
 
-        // Повертаємо тільки суму платежу
+        // 4. Розраховуємо новий баланс, читаючи з app_metadata
+        const currentBalance = userData.app_metadata.balance || 0;
+        const newBalance = currentBalance + amountPaid;
+
+        // 5. Оновлюємо баланс в app_metadata через адмін-API
+        const updateUserResponse = await fetch(adminUrl, {
+            method: 'PUT',
+            headers: { 
+                'Authorization': `Bearer ${NETLIFY_API_TOKEN}`, 
+                'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify({
+                app_metadata: { 
+                    ...userData.app_metadata, 
+                    balance: newBalance 
+                } 
+            })
+        });
+
+        if (!updateUserResponse.ok) {
+            const errorText = await updateUserResponse.text();
+            throw new Error(`Не вдалося оновити баланс: ${errorText}`);
+        }
+        
+        // 6. Повертаємо новий баланс клієнту для відображення
         return {
             statusCode: 200,
-            body: JSON.stringify({ success: true, amountPaid: amountPaid }),
+            body: JSON.stringify({ success: true, newBalance: newBalance }),
         };
 
     } catch (error) {
-        console.error('Помилка у функції верифікації платежу:', error.message);
+        console.error('Критична помилка у функції:', error.message);
         return {
             statusCode: 500,
             body: JSON.stringify({ error: error.message }),
