@@ -1,4 +1,4 @@
-// Повна і безпечна версія: functions/update-balance.js
+// functions/update-balance.js
 
 const fetch = require('node-fetch');
 
