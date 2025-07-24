@@ -53,7 +53,7 @@
         body.sidebar-collapsed .nav-icon { margin-right: 0; }
         body.sidebar-collapsed .collapse-btn svg { transform: rotate(180deg); }
         .page-header { position: sticky; top: 0; grid-column: 2 / 3; display: flex; justify-content: space-between; align-items: center; padding: 1rem 2.5rem; height: 72px; z-index: 1000; background-color: var(--bg-header); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); transition: background-color 0.3s, border-color 0.3s; }
-        .header-left { align-items: center; gap: 0.75rem; }
+        .header-left { display: none; align-items: center; gap: 0.75rem; }
         .logo-icon-header { width: 28px; height: 28px; color: var(--primary-color); }
         .page-header h1 { font-size: clamp(1.5rem, 4vw, 1.75rem); font-weight: 700; margin: 0; }
         .main-content { grid-column: 2 / 3; animation: content-fade-in .8s .2s both; }
@@ -115,7 +115,6 @@
     </style>
 </head>
 <body>
-    <div class="background-glow"></div>
     <div class="page-container">
         <aside class="sidebar">
             <a href="/wallet/" class="sidebar-header">
