@@ -30,12 +30,13 @@ exports.handler = async (event, context) => {
     }
 
     try {
-        const { orderID } = JSON.parse(event.body);
-        if (!orderID) {
-            return { statusCode: 400, body: JSON.stringify({ error: 'Відсутній ID замовлення (orderID).' }) };
+        // !! НОВЕ ВИПРАВЛЕННЯ !!: Отримуємо userId, переданий від клієнта
+        const { orderID, userId } = JSON.parse(event.body);
+        if (!orderID || !userId) {
+            return { statusCode: 400, body: JSON.stringify({ error: 'Відсутній ID замовлення або ID користувача.' }) };
         }
         
-        console.log(`Функція викликана для користувача: ${user.email} (ID: ${user.id})`);
+        console.log(`Функція викликана для користувача: ${user.email} (ID, отриманий від клієнта: ${userId})`);
 
         const paypalToken = await getPaypalAccessToken(PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET);
         const orderResponse = await fetch(`https://api.sandbox.paypal.com/v2/checkout/orders/${orderID}`, {
@@ -43,8 +44,6 @@ exports.handler = async (event, context) => {
         });
         
         const orderData = await orderResponse.json();
-        console.log(`Отримано дані замовлення від PayPal. Статус: ${orderData.status}`);
-        
         if (orderData.status !== 'COMPLETED' && orderData.status !== 'APPROVED') {
             return { statusCode: 400, body: JSON.stringify({ error: `Статус платежу не є успішним: ${orderData.status}` }) };
         }
@@ -52,13 +51,12 @@ exports.handler = async (event, context) => {
         const amountPaid = parseFloat(orderData.purchase_units[0].amount.value);
         console.log(`Платіж успішний. Сума: ${amountPaid} USD`);
 
-        // ВИПРАВЛЕННЯ №1: Читаємо баланс з app_metadata для безпеки
         const currentBalance = user.app_metadata.balance || 0;
         const newBalance = currentBalance + amountPaid;
         console.log(`Оновлення балансу: з ${currentBalance} на ${newBalance}`);
 
-        // ВИПРАВЛЕННЯ №2 (ГОЛОВНЕ): Використовуємо user.id замість user.sub
-        const netlifyAPIUrl = `https://api.netlify.com/api/v1/users/${user.id}`;
+        // !! ГОЛОВНЕ ВИПРАВЛЕННЯ !!: Використовуємо ID, отриманий з тіла запиту
+        const netlifyAPIUrl = `https://api.netlify.com/api/v1/users/${userId}`;
         
         const updateUserResponse = await fetch(netlifyAPIUrl, {
             method: 'PUT',
@@ -67,7 +65,6 @@ exports.handler = async (event, context) => {
                 'Content-Type': 'application/json' 
             },
             body: JSON.stringify({
-                // ВИПРАВЛЕННЯ №3: Записуємо баланс в app_metadata
                 app_metadata: { 
                     ...user.app_metadata, 
                     balance: newBalance 
