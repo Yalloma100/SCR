@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PayPal Integration</title>
+</head>
+<body>
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <script src="https://www.paypal.com/sdk/js?client-id=ASJIOL6y24xuwQiCC-a8RBkVypAp5VuYLf7cXEIzc4aLV5yYEXDVvellxQGHSN9mU&currency=USD"></script>
+
+  <div id="paypal-button-container"></div>
+
+  <script>
+    // Ініціалізація Netlify Identity
+    netlifyIdentity.init();
+
+    paypal.Buttons({
+      createOrder: function(data, actions) {
+        return actions.order.create({
+          purchase_units: [{
+            amount: {
+              value: '5.00'
+            }
+          }]
+        });
+      },
+      onApprove: async function(data, actions) {
+        try {
+          const details = await actions.order.capture();
+          console.log('Transaction completed by ' + details.payer.name.given_name);
+
+          // Отримання токена користувача Netlify
+          const user = netlifyIdentity.currentUser();
+          if (!user) throw new Error("Користувач не авторизований");
+
+          const token = await user.jwt();
+
+          const response = await fetch('/.netlify/functions/update-balance', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}` // ← ОБОВ'ЯЗКОВО!
+            },
+            body: JSON.stringify({
+              email: user.email,
+              amount: 5.00
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error(`Сервер відповів зі статусом ${response.status}`);
+          }
+
+          const result = await response.json();
+          console.log('Balance updated:', result);
+        } catch (error) {
+          console.error('Error processing payment:', error);
+        }
+      }
+    }).render('#paypal-button-container');
+  </script>
+</body>
+</html>
