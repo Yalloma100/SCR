@@ -2,11 +2,13 @@
 
 const fetch = require('node-fetch');
 
-// Ваші ключі залишаються незмінними.
+// !! КРОК 2: ВСТАВТЕ СЮДИ ВАШ НОВИЙ ТОКЕН, ЗГЕНЕРОВАНИЙ НА КРОЦІ 1 !!
+const NETLIFY_API_TOKEN    = "ВСТАВТЕ_ВАШ_НОВИЙ_ТОКЕН_ТУТ"; 
+// ---------------------------------------------------
+
+// Ваші ключі PayPal залишаються без змін
 const PAYPAL_CLIENT_ID     = "ASJIOL6y24xuwQiCC-a8RBkVypAp5VuYLf7cXEIzc4aLV5yYEXDVvellq-OGQQfZjkqJBZh1h0JqS9mU";
 const PAYPAL_CLIENT_SECRET = "EJ4fJwwhV6PIVwQBJkvXSPRf8OWm6sVLYPXgQpqr4_GuMN_PIaaDpevPGg4AR-VlRu2Uly7x4NmsdGeY";
-const NETLIFY_API_TOKEN    = "nfp_Hv9X1JNB9EqRxxLMB2YCnaUgzcL1GLoA6620"; // Ваш токен, який виявився правильним
-// ---------------------------------------------------
 
 async function getPaypalAccessToken(clientId, clientSecret) {
     const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
@@ -50,13 +52,12 @@ exports.handler = async (event, context) => {
         const amountPaid = parseFloat(orderData.purchase_units[0].amount.value);
         console.log(`Платіж успішний. Сума: ${amountPaid} USD`);
 
-        // ✅ ВИПРАВЛЕННЯ: Використовуємо user_metadata
-        const currentBalance = user.user_metadata?.balance || 0;
+        const currentBalance = user.app_metadata.balance || 0;
         const newBalance = currentBalance + amountPaid;
         console.log(`Оновлення балансу: з ${currentBalance} на ${newBalance}`);
 
-        // ✅ ГОЛОВНЕ ВИПРАВЛЕННЯ: Використовуємо правильний endpoint /identity/users/
-        const netlifyAPIUrl = `https://api.netlify.com/api/v1/identity/users/${userId}`;
+        // ВИКОРИСТОВУЄМО ПРАВИЛЬНИЙ ENDPOINT БЕЗ /identity
+        const netlifyAPIUrl = `https://api.netlify.com/api/v1/users/${userId}`;
         
         const updateUserResponse = await fetch(netlifyAPIUrl, {
             method: 'PUT',
@@ -65,15 +66,15 @@ exports.handler = async (event, context) => {
                 'Content-Type': 'application/json' 
             },
             body: JSON.stringify({
-                // ✅ ВИПРАВЛЕННЯ: Записуємо в user_metadata
-                user_metadata: { 
-                    ...user.user_metadata, 
+                app_metadata: { 
+                    ...user.app_metadata, 
                     balance: newBalance 
                 } 
             })
         });
 
         if (!updateUserResponse.ok) {
+            // Цього разу ми очікуємо JSON, оскільки endpoint правильний
             const errorBody = await updateUserResponse.json();
             console.error("Помилка оновлення користувача в Netlify:", errorBody);
             throw new Error(`Не вдалося оновити баланс. Відповідь Netlify: ${JSON.stringify(errorBody)}`);
