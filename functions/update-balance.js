@@ -3,7 +3,7 @@
 const fetch = require('node-fetch');
 
 // Ваш старий токен, який ми тестуємо
-const NETLIFY_API_TOKEN    = "nfp_Hv9X1JNB9EqRxxLMB2YCnaUgzcL1GLoA6620"; 
+const NETLIFY_API_TOKEN    = "nfp_AMftYBRVkTJa7BzWuCuLEnY97ys9ezqAf941"; 
 // ---------------------------------------------------
 
 const PAYPAL_CLIENT_ID     = "ASJIOL6y24xuwQiCC-a8RBkVypAp5VuYLf7cXEIzc4aLV5yYEXDVvellq-OGQQfZjkqJBZh1h0JqS9mU";
