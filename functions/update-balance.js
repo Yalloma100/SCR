@@ -2,12 +2,11 @@
 
 const fetch = require('node-fetch');
 
-// !! КРОК 2: ВСТАВТЕ СЮДИ ВАШ НОВИЙ ТОКЕН !!
-const NETLIFY_API_TOKEN    = "nfp_4NAD5LYanv1mgtUKojBjYaapBpHdkKCsbdab"; 
-// ---------------------------------------------------
-
+// Ваші ключі залишаються незмінними.
 const PAYPAL_CLIENT_ID     = "ASJIOL6y24xuwQiCC-a8RBkVypAp5VuYLf7cXEIzc4aLV5yYEXDVvellq-OGQQfZjkqJBZh1h0JqS9mU";
 const PAYPAL_CLIENT_SECRET = "EJ4fJwwhV6PIVwQBJkvXSPRf8OWm6sVLYPXgQpqr4_GuMN_PIaaDpevPGg4AR-VlRu2Uly7x4NmsdGeY";
+const NETLIFY_API_TOKEN    = "nfp_Hv9X1JNB9EqRxxLMB2YCnaUgzcL1GLoA6620"; // Ваш токен, який виявився правильним
+// ---------------------------------------------------
 
 async function getPaypalAccessToken(clientId, clientSecret) {
     const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
@@ -51,11 +50,13 @@ exports.handler = async (event, context) => {
         const amountPaid = parseFloat(orderData.purchase_units[0].amount.value);
         console.log(`Платіж успішний. Сума: ${amountPaid} USD`);
 
-        const currentBalance = user.app_metadata.balance || 0;
+        // ✅ ВИПРАВЛЕННЯ: Використовуємо user_metadata
+        const currentBalance = user.user_metadata?.balance || 0;
         const newBalance = currentBalance + amountPaid;
         console.log(`Оновлення балансу: з ${currentBalance} на ${newBalance}`);
 
-        const netlifyAPIUrl = `https://api.netlify.com/api/v1/users/${userId}`;
+        // ✅ ГОЛОВНЕ ВИПРАВЛЕННЯ: Використовуємо правильний endpoint /identity/users/
+        const netlifyAPIUrl = `https://api.netlify.com/api/v1/identity/users/${userId}`;
         
         const updateUserResponse = await fetch(netlifyAPIUrl, {
             method: 'PUT',
@@ -64,8 +65,9 @@ exports.handler = async (event, context) => {
                 'Content-Type': 'application/json' 
             },
             body: JSON.stringify({
-                app_metadata: { 
-                    ...user.app_metadata, 
+                // ✅ ВИПРАВЛЕННЯ: Записуємо в user_metadata
+                user_metadata: { 
+                    ...user.user_metadata, 
                     balance: newBalance 
                 } 
             })
