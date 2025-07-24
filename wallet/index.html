@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Гаманець - SCR</title>
     
-    <script src="https://www.paypal.com/sdk/js?client-id=ASJIOL6y24xuwQiCC-a8RBkVypAp5VuYLf7cXEIzc4aLV5yYEXDVvellq-OGQQfZjkqJBZh1h0JqS9mU&currency=USD"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=ASJIOL6y24xuwQiCC-a8RBkVypAp5VuYLf7cXEIzc4aLV5yYEXDVvellq-OGQQfZjkqJBZh1h0JqS9mU¤cy=USD"></script>
     <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -93,21 +93,13 @@
 
     <div class="modal-overlay" id="deposit-modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h3>Поповнити баланс</h3>
-                <button class="modal-close-btn" id="modal-close">×</button>
-            </div>
+            <div class="modal-header"><h3>Поповнити баланс</h3><button class="modal-close-btn" id="modal-close">×</button></div>
             <div id="modal-step-1">
-                <form id="amount-form">
-                    <label for="amount-input">Сума в USD</label>
-                    <input type="number" id="amount-input" min="1" step="1" placeholder="напр. 15" required>
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">Перейти до оплати</button>
-                </form>
+                <form id="amount-form"><label for="amount-input">Сума в USD</label><input type="number" id="amount-input" min="1" step="1" placeholder="напр. 15" required><button type="submit" class="btn btn-primary" style="width: 100%;">Перейти до оплати</button></form>
             </div>
             <div id="modal-step-2" class="hidden">
                 <p id="payment-info">Для завершення операції, будь ласка, оплатіть через PayPal.</p>
-                <div id="paypal-button-container"></div>
-                <p id="payment-status" style="text-align:center; margin-top:1rem;"></p>
+                <div id="paypal-button-container"></div><p id="payment-status" style="text-align:center; margin-top:1rem;"></p>
             </div>
         </div>
     </div>
@@ -118,92 +110,63 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         const user = netlifyIdentity.currentUser();
-        // Перевірка авторизації
-        if (!user) {
-            window.location.replace('/'); // Використовуємо replace для чистої історії браузера
-            return;
-        }
+        if (!user) { window.location.replace('/'); return; }
 
-        // Оголошення елементів DOM
         const balanceAmountEl = document.querySelector('.balance-amount');
         const depositBtn = document.getElementById('deposit-btn');
         const depositModal = document.getElementById('deposit-modal');
         const modalCloseBtn = document.getElementById('modal-close');
-        const modalStep1 = document.getElementById('modal-step-1');
-        const modalStep2 = document.getElementById('modal-step-2');
         const amountForm = document.getElementById('amount-form');
         const amountInput = document.getElementById('amount-input');
         const paymentStatus = document.getElementById('payment-status');
         const paypalContainer = document.getElementById('paypal-button-container');
 
-        // Функція для форматованого відображення балансу
         const displayBalance = (balanceValue) => {
-            const numericBalance = Number(balanceValue) || 0;
-            const formattedBalance = numericBalance.toFixed(2);
-            balanceAmountEl.innerHTML = `<span>${formattedBalance} SCR</span>`;
+            balanceAmountEl.innerHTML = `<span>${(Number(balanceValue) || 0).toFixed(2)} SCR</span>`;
         };
         
-        // Функція для завантаження актуального балансу
         const loadBalance = async () => {
             try {
-                // Примусово оновлюємо токен користувача, щоб отримати найсвіжіші app_metadata
-                const refreshedUser = await user.jwt(true);
-                // Оновлюємо об'єкт користувача, щоб мати доступ до свіжих даних
+                await user.jwt(true);
                 const latestUser = netlifyIdentity.currentUser();
-                // ВИПРАВЛЕННЯ: Читаємо баланс з app_metadata
-                const currentBalance = latestUser?.app_metadata?.balance || 0;
-                displayBalance(currentBalance);
+                displayBalance(latestUser?.app_metadata?.balance);
             } catch (error) {
                 console.error("Не вдалося оновити дані користувача:", error);
-                // У випадку помилки показуємо старі дані, якщо вони є
-                const localBalance = user?.app_metadata?.balance || 0;
-                displayBalance(localBalance);
+                displayBalance(user?.app_metadata?.balance);
             }
         };
         
-        // Завантажуємо баланс при першому відкритті сторінки
         loadBalance();
 
-        // Керування модальним вікном
-        const openModal = () => { depositModal.classList.add('visible'); resetModal(); };
-        const closeModal = () => { depositModal.classList.remove('visible'); };
-        const resetModal = () => {
-            modalStep1.classList.remove('hidden');
-            modalStep2.classList.add('hidden');
+        const openModal = () => {
+            depositModal.classList.add('visible');
+            document.getElementById('modal-step-1').classList.remove('hidden');
+            document.getElementById('modal-step-2').classList.add('hidden');
             amountInput.value = '';
             paymentStatus.textContent = '';
             paypalContainer.innerHTML = '';
         };
 
+        const closeModal = () => depositModal.classList.remove('visible');
         depositBtn.addEventListener('click', openModal);
         modalCloseBtn.addEventListener('click', closeModal);
         depositModal.addEventListener('click', (e) => { if (e.target === depositModal) closeModal(); });
 
-        // Обробка форми вводу суми
         amountForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const amount = amountInput.value;
-            if (amount && parseFloat(amount) >= 1) { // PayPal має мінімальну суму
-                if (typeof paypal !== 'undefined') {
-                    modalStep1.classList.add('hidden');
-                    modalStep2.classList.remove('hidden');
-                    renderPayPalButtons(amount);
-                } else {
-                    paymentStatus.textContent = 'Помилка завантаження платіжної системи.';
-                }
+            if (amount && parseFloat(amount) >= 1) {
+                document.getElementById('modal-step-1').classList.add('hidden');
+                document.getElementById('modal-step-2').classList.remove('hidden');
+                renderPayPalButtons(amount);
             } else {
                 alert('Будь ласка, введіть суму, що дорівнює або більша за 1 USD.');
             }
         });
 
-        // Рендер кнопок PayPal та обробка платежу
         const renderPayPalButtons = (amount) => {
             paypal.Buttons({
-                createOrder: (data, actions) => {
-                    return actions.order.create({
-                        purchase_units: [{ amount: { value: amount, currency_code: 'USD' } }]
-                    });
-                },
+                createOrder: (data, actions) => actions.order.create({ purchase_units: [{ amount: { value: amount, currency_code: 'USD' } }] }),
                 onApprove: (data, actions) => {
                     paymentStatus.textContent = 'Обробка платежу...';
                     
@@ -213,20 +176,19 @@
                             'Authorization': `Bearer ${user.token.access_token}`,
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ orderID: data.orderID })
+                        // !! НОВЕ ВИПРАВЛЕННЯ !!: Передаємо ID користувача разом із запитом
+                        body: JSON.stringify({ 
+                            orderID: data.orderID,
+                            userId: user.id 
+                        })
                     })
                     .then(res => {
-                        if (!res.ok) { // Перевірка статусу відповіді
-                            return res.json().then(err => { throw new Error(err.error || `Сервер відповів зі статусом ${res.status}`) });
-                        }
+                        if (!res.ok) { return res.json().then(err => { throw new Error(err.error || `Сервер відповів зі статусом ${res.status}`) }); }
                         return res.json();
                     })
                     .then(result => {
-                        if (result.error) {
-                            throw new Error(result.error);
-                        }
                         paymentStatus.textContent = `Оплата успішна! Ваш новий баланс: ${result.newBalance.toFixed(2)} SCR`;
-                        loadBalance(); // Оновлюємо баланс на головній сторінці
+                        loadBalance();
                         setTimeout(closeModal, 3000);
                     })
                     .catch(err => {
@@ -241,14 +203,9 @@
             }).render('#paypal-button-container');
         };
 
-        // Логіка виходу з системи
         const logoutButton = document.getElementById('logout-button');
-        logoutButton.addEventListener('click', () => {
-            netlifyIdentity.logout();
-        });
-        netlifyIdentity.on('logout', () => {
-            window.location.replace('/');
-        });
+        logoutButton.addEventListener('click', () => netlifyIdentity.logout());
+        netlifyIdentity.on('logout', () => window.location.replace('/'));
     });
     </script>
 </body>
