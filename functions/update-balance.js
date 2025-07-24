@@ -1,11 +1,11 @@
 // Шлях до файлу: /functions/update-balance.js
 
 const fetch = require('node-fetch');
+// Імпортуємо getStore з SDK для Netlify Blobs
+const { getStore } = require('@netlify/blobs');
 
 const PAYPAL_CLIENT_ID     = process.env.PAYPAL_CLIENT_ID;
 const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET;
-const NETLIFY_API_TOKEN    = process.env.NETLIFY_API_TOKEN; // Отримуємо токен з середовища
-const NETLIFY_SITE_URL     = process.env.URL; // URL вашого сайту
 
 // Функція для отримання токена PayPal (без змін)
 async function getPaypalAccessToken(clientId, clientSecret) {
@@ -15,17 +15,14 @@ async function getPaypalAccessToken(clientId, clientSecret) {
         headers: { 'Authorization': `Basic ${auth}`, 'Content-Type': 'application/x-www-form-urlencoded' },
         body: 'grant_type=client_credentials'
     });
-    if (!response.ok) {
-        const errorBody = await response.text();
-        throw new Error(`Помилка отримання токену PayPal: ${response.status} ${errorBody}`);
-    }
+    if (!response.ok) throw new Error(`Помилка отримання токену PayPal: ${await response.text()}`);
     const data = await response.json();
     return data.access_token;
 }
 
 exports.handler = async (event, context) => {
-    // 1. Перевіряємо, чи авторизований користувач
-    const { user } = context.clientContext;
+    // 1. Отримуємо дані користувача та його токен з контексту
+    const { user, token } = context.clientContext;
     if (!user) {
         return { statusCode: 401, body: JSON.stringify({ error: 'Ви не авторизовані.' }) };
     }
@@ -36,60 +33,67 @@ exports.handler = async (event, context) => {
             return { statusCode: 400, body: JSON.stringify({ error: 'Відсутній ID замовлення.' }) };
         }
 
-        // 2. Перевіряємо платіж PayPal (без змін)
+        // 2. ЗАХИСТ: Перевіряємо, чи не використовувався цей платіж раніше
+        const ordersStore = getStore('processed_orders');
+        const existingOrder = await ordersStore.get(orderID);
+        if (existingOrder) {
+            return { statusCode: 409, body: JSON.stringify({ error: 'Цей платіж вже було зараховано.' }) }; // 409 Conflict
+        }
+
+        // 3. Перевірка платежу PayPal (логіка без змін)
         const paypalToken = await getPaypalAccessToken(PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET);
         const orderResponse = await fetch(`https://api.sandbox.paypal.com/v2/checkout/orders/${orderID}`, {
             headers: { 'Authorization': `Bearer ${paypalToken}` }
         });
         const orderData = await orderResponse.json();
-
         if (orderData.status !== 'COMPLETED' && orderData.status !== 'APPROVED') {
             return { statusCode: 400, body: JSON.stringify({ error: `Статус платежу не є успішним: ${orderData.status}` }) };
         }
-
         const amountPaid = parseFloat(orderData.purchase_units[0].amount.value);
-        
-        // 3. Отримуємо повні дані користувача через адмін-API
-        const adminUrl = `${NETLIFY_SITE_URL}/.netlify/identity/admin/users/${user.sub}`;
-        const userResponse = await fetch(adminUrl, {
-            headers: { 'Authorization': `Bearer ${NETLIFY_API_TOKEN}` }
-        });
-        if (!userResponse.ok) throw new Error("Не вдалося отримати дані користувача.");
-        
-        const userData = await userResponse.json();
 
-        // 4. Розраховуємо новий баланс, читаючи з app_metadata
-        const currentBalance = userData.app_metadata.balance || 0;
+        // 4. Отримуємо актуальний баланс користувача (використовуючи його власний токен)
+        // Це потрібно, щоб уникнути стану гонки, якщо користувач відкрив дві вкладки
+        const userApiUrl = `${user.url}/user`;
+        const currentUserResponse = await fetch(userApiUrl, {
+            headers: { 'Authorization': `Bearer ${token.access_token}` }
+        });
+        if (!currentUserResponse.ok) throw new Error("Не вдалося отримати актуальні дані користувача.");
+        const currentUserData = await currentUserResponse.json();
+        const currentBalance = currentUserData.user_metadata.balance || 0;
+        
+        // 5. Розраховуємо новий баланс
         const newBalance = currentBalance + amountPaid;
 
-        // 5. Оновлюємо баланс в app_metadata через адмін-API
-        const updateUserResponse = await fetch(adminUrl, {
+        // 6. Оновлюємо баланс в user_metadata від імені самого користувача
+        const updateUserResponse = await fetch(userApiUrl, {
             method: 'PUT',
             headers: { 
-                'Authorization': `Bearer ${NETLIFY_API_TOKEN}`, 
+                'Authorization': `Bearer ${token.access_token}`, 
                 'Content-Type': 'application/json' 
             },
             body: JSON.stringify({
-                app_metadata: { 
-                    ...userData.app_metadata, 
+                data: { // Важливо! Дані для user_metadata йдуть в полі 'data'
+                    ...currentUserData.user_metadata, // Зберігаємо інші метадані, якщо вони є
                     balance: newBalance 
                 } 
             })
         });
 
         if (!updateUserResponse.ok) {
-            const errorText = await updateUserResponse.text();
-            throw new Error(`Не вдалося оновити баланс: ${errorText}`);
+            throw new Error(`Не вдалося оновити баланс користувача: ${await updateUserResponse.text()}`);
         }
+
+        // 7. ЗАХИСТ: Позначаємо платіж як використаний, щоб запобігти повторному використанню
+        await ordersStore.set(orderID, { userId: user.sub, timestamp: new Date().toISOString() });
         
-        // 6. Повертаємо новий баланс клієнту для відображення
+        // 8. Повертаємо успішну відповідь
         return {
             statusCode: 200,
             body: JSON.stringify({ success: true, newBalance: newBalance }),
         };
 
     } catch (error) {
-        console.error('Критична помилка у функції:', error.message);
+        console.error('Критична помилка у функції оновлення балансу:', error.message);
         return {
             statusCode: 500,
             body: JSON.stringify({ error: error.message }),
