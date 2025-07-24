@@ -40,10 +40,12 @@
             try {
                 await user.jwt(true);
                 const latestUser = netlifyIdentity.currentUser();
-                displayBalance(latestUser?.app_metadata?.balance);
+                // ДІАГНОСТИЧНА ЗМІНА: Читаємо з user_metadata
+                displayBalance(latestUser?.user_metadata?.balance);
             } catch (error) {
                 console.error("Не вдалося оновити дані користувача:", error);
-                displayBalance(user?.app_metadata?.balance);
+                // ДІАГНОСТИЧНА ЗМІНА: Читаємо з user_metadata
+                displayBalance(user?.user_metadata?.balance);
             }
         };
         
