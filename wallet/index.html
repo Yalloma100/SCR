@@ -1,5 +1,3 @@
-<!-- Шлях до файлу: /wallet/index.html -->
-
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -11,18 +9,247 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Ваш CSS без змін -->
-    <style>:root{--primary-color:#9333ea;--primary-glow:rgba(147,51,234,0.4);--primary-hover:#a855f7;--bg-main:#020617;--bg-sidebar:#0f172a;--bg-card:rgba(15,23,42,0.6);--text-primary:#f8fafc;--text-secondary:#94a3b8;--border-color:rgba(51,65,85,0.5);--border-hover:rgba(147,51,234,0.6);--sidebar-width:260px}*,::after,::before{box-sizing:border-box}body{margin:0;font-family:Inter,sans-serif;background-color:var(--bg-main);color:var(--text-primary)}.page-container{display:grid;grid-template-columns:var(--sidebar-width) 1fr;min-height:100vh}.sidebar{background-color:var(--bg-sidebar);border-right:1px solid var(--border-color);padding:1.5rem 1rem;display:flex;flex-direction:column;position:fixed;left:0;top:0;height:100%;width:var(--sidebar-width);transition:transform .3s cubic-bezier(.4,0,.2,1);z-index:1000}.sidebar-header{display:flex;align-items:center;margin-bottom:2.5rem;padding:0 .5rem;color:var(--text-primary);text-decoration:none;transition:color .3s}.sidebar-header:hover{color:var(--primary-color)}.logo-icon{width:32px;height:32px;flex-shrink:0;transition:transform .4s cubic-bezier(.175,.885,.32,1.275)}.sidebar-header:hover .logo-icon{transform:rotate(-10deg) scale(1.05);filter:drop-shadow(0 0 10px var(--primary-glow))}.logo-text{font-size:1.5rem;font-weight:700;margin-left:1rem}.nav-menu{list-style:none;padding:0;margin:0;flex-grow:1}.nav-item a{display:flex;align-items:center;padding:.8rem 1rem;color:var(--text-secondary);text-decoration:none;border-radius:8px;margin-bottom:.5rem;transition:all .2s;font-weight:500}.nav-item a:hover{background-color:rgba(255,255,255,.05);color:var(--text-primary);transform:translateX(4px)}.nav-item.active a{background:linear-gradient(90deg,var(--primary-color),#5b21b6);color:var(--text-primary);font-weight:600;box-shadow:0 4px 15px -3px var(--primary-glow)}.nav-icon{width:24px;height:24px;margin-right:1.25rem;flex-shrink:0}.user-profile{margin-top:auto;padding-top:1rem;border-top:1px solid var(--border-color)}#logout-button{background:0 0;border:none;color:var(--text-secondary);width:100%;padding:1rem;display:flex;align-items:center;text-align:left;font-size:1rem;cursor:pointer;border-radius:8px;font-weight:500;transition:all .2s}#logout-button:hover{background-color:rgba(239,68,68,.1);color:#ef4444}.main-content{padding:2.5rem;grid-column:2/3;animation:content-fade-in .8s cubic-bezier(.215,.61,.355,1)}.page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border-color)}.page-header h1{font-size:2.5rem;font-weight:800;margin:0;letter-spacing:-.025em}.dashboard-grid{display:flex;justify-content:center;align-items:flex-start;padding-top:2rem}.balance-card{position:relative;background-color:var(--bg-card);border:1px solid var(--border-color);border-radius:24px;padding:2.5rem 3rem;text-align:center;width:100%;max-width:500px;backdrop-filter:blur(16px);box-shadow:0 4px 30px rgba(0,0,0,.2);transition:all .3s ease}.balance-card::before{content:"";position:absolute;inset:0;border-radius:24px;padding:1px;background:radial-gradient(40% 60% at 50% 110%,var(--primary-color) 0,transparent 100%);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .3s;z-index:-1}.balance-card:hover{border-color:var(--border-hover);box-shadow:0 10px 35px rgba(0,0,0,.3),0 0 40px -10px var(--primary-glow)}.balance-card:hover::before{opacity:1}.balance-title{color:var(--text-secondary);font-size:1rem;font-weight:500;margin:0 0 1rem;text-transform:uppercase;letter-spacing:.08em}.balance-amount{color:var(--text-primary);font-size:3.75rem;font-weight:700;margin:0 0 2.5rem;min-height:66px;display:flex;justify-content:center;align-items:center;text-shadow:0 0 25px var(--primary-glow)}.action-buttons{display:flex;gap:1.5rem;justify-content:center}.btn{padding:.875rem 1.75rem;font-size:1rem;font-weight:600;border-radius:8px;border:none;cursor:pointer;transition:all .2s ease-out;flex-grow:1;max-width:180px}.btn-primary{background-image:linear-gradient(120deg,var(--primary-color) 0,#5b21b6 100%);background-size:200% 100%;color:#fff;box-shadow:0 4px 15px -5px var(--primary-glow)}.btn-primary:hover{transform:translateY(-3px);background-position:100% 0;box-shadow:0 8px 20px -5px var(--primary-glow)}.btn-secondary{background-color:transparent;color:var(--text-secondary);border:1px solid var(--border-color)}.btn-secondary:hover{background-color:rgba(255,255,255,.05);color:var(--text-primary);border-color:var(--text-secondary);transform:translateY(-3px)}.skeleton{animation:pulse 1.5s cubic-bezier(.4,0,.6,1) infinite;background-color:rgba(51,65,85,.8);border-radius:8px;height:52px;width:240px}@keyframes pulse{0%,to{opacity:1}50%{opacity:.6}}.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.7);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);z-index:2000;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all .3s ease}.modal-overlay.visible{opacity:1;visibility:visible}.modal-content{background-color:var(--bg-sidebar);border:1px solid var(--border-color);border-radius:16px;padding:2rem;width:90%;max-width:400px;transform:scale(.95);transition:transform .3s ease}.modal-overlay.visible .modal-content{transform:scale(1)}.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem}.modal-header h3{margin:0;font-size:1.5rem}.modal-close-btn{background:0 0;border:none;color:var(--text-secondary);font-size:1.5rem;cursor:pointer}#amount-form label{display:block;margin-bottom:.5rem;color:var(--text-secondary)}#amount-form input{width:100%;padding:.75rem;font-size:1.25rem;border-radius:8px;border:1px solid var(--border-color);background-color:var(--bg-main);color:var(--text-primary);margin-bottom:1rem}#paypal-button-container{margin-top:1rem;text-align:center;min-height:50px}.hidden{display:none}</style>
+    
+    <style>
+        /* --- ОСНОВНІ СТИЛІ (без змін) --- */
+        :root {
+            --primary-color: #9333ea;
+            --primary-glow: rgba(147, 51, 234, 0.4);
+            --primary-hover: #a855f7;
+            --danger-color: #ef4444;
+            --bg-main: #020617;
+            --bg-sidebar: #0f172a;
+            --bg-card: rgba(15, 23, 42, 0.7); /* Зроблено трохи прозорішим */
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: rgba(51, 65, 85, 0.5);
+            --border-hover: rgba(147, 51, 234, 0.6);
+            --sidebar-width: 260px;
+        }
+
+        *, ::after, ::before { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+        }
+
+        .page-container {
+            display: grid;
+            grid-template-columns: var(--sidebar-width) 1fr;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: var(--sidebar-width);
+            transition: transform .3s cubic-bezier(.4, 0, .2, 1);
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            padding: 0 .5rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: color .3s;
+        }
+
+        .sidebar-header:hover { color: var(--primary-color); }
+        .logo-icon { width: 32px; height: 32px; flex-shrink: 0; transition: transform .4s cubic-bezier(.175, .885, .32, 1.275); }
+        .sidebar-header:hover .logo-icon { transform: rotate(-10deg) scale(1.05); filter: drop-shadow(0 0 10px var(--primary-glow)); }
+        .logo-text { font-size: 1.5rem; font-weight: 700; margin-left: 1rem; }
+        .nav-menu { list-style: none; padding: 0; margin: 0; flex-grow: 1; }
+        .nav-item a { display: flex; align-items: center; padding: .8rem 1rem; color: var(--text-secondary); text-decoration: none; border-radius: 8px; margin-bottom: .5rem; transition: all .2s; font-weight: 500; }
+        .nav-item a:hover { background-color: rgba(255, 255, 255, .05); color: var(--text-primary); transform: translateX(4px); }
+        .nav-item.active a { background: linear-gradient(90deg, var(--primary-color), #5b21b6); color: var(--text-primary); font-weight: 600; box-shadow: 0 4px 15px -3px var(--primary-glow); }
+        .nav-icon { width: 24px; height: 24px; margin-right: 1.25rem; flex-shrink: 0; }
+        
+        .user-profile { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border-color); }
+        #logout-button { background: 0 0; border: none; color: var(--text-secondary); width: 100%; padding: 1rem; display: flex; align-items: center; text-align: left; font-size: 1rem; cursor: pointer; border-radius: 8px; font-weight: 500; transition: all .2s; }
+        #logout-button:hover { background-color: rgba(239, 68, 68, .1); color: var(--danger-color); }
+
+        /* --- ЗМІНА 1: Покращено main-content та додано анімацію --- */
+        .main-content {
+            padding: 2.5rem;
+            grid-column: 2/3;
+            animation: content-fade-in .8s cubic-bezier(.215, .61, .355, 1);
+            background-image: radial-gradient(circle at 100% 0%, rgba(147, 51, 234, 0.1), transparent 40%);
+        }
+        @keyframes content-fade-in { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); }
+        .page-header h1 { font-size: 2.5rem; font-weight: 800; margin: 0; letter-spacing: -.025em; }
+
+        /* --- ЗМІНА 2: Стилізація dashboard-grid для центрування картки (стиль Tonkeeper) --- */
+        .dashboard-grid {
+            display: grid;
+            place-items: center; /* Центрує картку по горизонталі та вертикалі */
+            padding-top: 2rem;
+        }
+
+        /* --- ЗМІНА 3: Покращено вигляд картки балансу --- */
+        .balance-card {
+            position: relative;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2.5rem 3rem;
+            text-align: center;
+            width: 100%;
+            max-width: 480px; /* Обмежено ширину для кращого вигляду на великих екранах */
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, .2);
+            transition: all .3s ease;
+        }
+        .balance-card::before { content: ""; position: absolute; inset: 0; border-radius: 24px; padding: 1px; background: radial-gradient(40% 60% at 50% 110%, var(--primary-color) 0, transparent 100%); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; opacity: 0; transition: opacity .3s; z-index: -1; }
+        .balance-card:hover { border-color: var(--border-hover); box-shadow: 0 10px 35px rgba(0, 0, 0, .3), 0 0 40px -10px var(--primary-glow); }
+        .balance-card:hover::before { opacity: 1; }
+        
+        .balance-title { color: var(--text-secondary); font-size: 1rem; font-weight: 500; margin: 0 0 1rem; text-transform: uppercase; letter-spacing: .08em; }
+        .balance-amount { color: var(--text-primary); font-size: 3.5rem; /* Трохи зменшено для кращої адаптації */ font-weight: 700; margin: 0 0 2.5rem; min-height: 60px; display: flex; justify-content: center; align-items: center; text-shadow: 0 0 25px var(--primary-glow); }
+        .action-buttons { display: flex; flex-direction: column; gap: 1rem; justify-content: center; } /* Змінено на column для мобільних */
+
+        .btn { padding: .875rem 1.75rem; font-size: 1rem; font-weight: 600; border-radius: 12px; /* Збільшено заокруглення */ border: none; cursor: pointer; transition: all .2s ease-out; width: 100%; }
+        .btn-primary { background-image: linear-gradient(120deg, var(--primary-color) 0, #5b21b6 100%); background-size: 200% 100%; color: #fff; box-shadow: 0 4px 15px -5px var(--primary-glow); }
+        .btn-primary:hover { transform: translateY(-3px); background-position: 100% 0; box-shadow: 0 8px 20px -5px var(--primary-glow); }
+        .btn-secondary { background-color: rgba(51, 65, 85, 0.4); color: var(--text-secondary); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { background-color: rgba(51, 65, 85, 0.7); color: var(--text-primary); border-color: var(--text-secondary); transform: translateY(-3px); }
+        
+        .skeleton { animation: pulse 1.5s cubic-bezier(.4, 0, .6, 1) infinite; background-color: rgba(51, 65, 85, .8); border-radius: 8px; height: 52px; width: 240px; }
+        @keyframes pulse { 0%, to { opacity: 1 } 50% { opacity: .6 } }
+
+        /* --- СТИЛІ МОДАЛЬНОГО ВІКНА (без змін) --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, .7); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all .3s ease; }
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        .modal-content { background-color: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; width: 90%; max-width: 400px; transform: scale(.95); transition: transform .3s ease; }
+        .modal-overlay.visible .modal-content { transform: scale(1); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .modal-header h3 { margin: 0; font-size: 1.5rem; }
+        .modal-close-btn { background: 0 0; border: none; color: var(--text-secondary); font-size: 1.5rem; cursor: pointer; }
+        #amount-form label { display: block; margin-bottom: .5rem; color: var(--text-secondary); }
+        #amount-form input { width: 100%; padding: .75rem; font-size: 1.25rem; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--bg-main); color: var(--text-primary); margin-bottom: 1rem; }
+        #paypal-button-container { margin-top: 1rem; text-align: center; min-height: 50px; }
+        .hidden { display: none; }
+
+        /* --- НОВИЙ БЛОК: АДАПТИВНІСТЬ (з settings.html) --- */
+        .sidebar-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            border-radius: 8px;
+            transition: color 0.2s, background-color 0.2s;
+            z-index: 1001;
+        }
+        .sidebar-toggle:hover {
+            color: var(--text-primary);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        
+        @media (min-width: 576px) {
+             .action-buttons {
+                flex-direction: row; /* Повертаємо кнопки в ряд на більших екранах */
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .page-container { grid-template-columns: 1fr; }
+            .sidebar { transform: translateX(-100%); }
+            body.sidebar-open .sidebar { transform: translateX(0); }
+            .main-content { grid-column: 1 / 2; padding: 1.5rem; }
+            .page-header h1 { font-size: 2rem; }
+            .sidebar-toggle { display: block; }
+            body.sidebar-open .overlay { opacity: 1; visibility: visible; }
+            .balance-card { padding: 2rem 1.5rem; }
+            .balance-amount { font-size: 2.75rem; }
+        }
+    </style>
 </head>
 <body>
-    <!-- Ваш HTML без змін -->
-    <div class="page-container"><aside class="sidebar"><a href="/wallet/" class="sidebar-header"><svg class="logo-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path></svg><span class="logo-text">SCR</span></a><ul class="nav-menu"><li class="nav-item active"><a href="/wallet/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg></span><span class="nav-text">Гаманець</span></a></li><li class="nav-item"><a href="/transactions/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></span><span class="nav-text">Транзакції</span></a></li><li class="nav-item"><a href="/rates/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg></span><span class="nav-text">Курси</span></a></li><li class="nav-item"><a href="/settings/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></span><span class="nav-text">Налаштування</span></a></li></ul><div class="user-profile"><button id="logout-button" title="Вийти з акаунту"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></span><span class="nav-text">Вийти</span></button></div></aside><main class="main-content"><header class="page-header"><h1>Гаманець</h1></header><div class="dashboard-grid"><div class="balance-card"><p class="balance-title">Загальний баланс</p><h2 class="balance-amount"><div class="skeleton"></div></h2><div class="action-buttons"><button id="deposit-btn" class="btn btn-primary">Поповнити</button><button class="btn btn-secondary" onclick="alert('Функція виводу коштів у розробці.')">Вивести</button></div></div></div></main></div><div class="modal-overlay" id="deposit-modal"><div class="modal-content"><div class="modal-header"><h3>Поповнити баланс</h3><button class="modal-close-btn" id="modal-close">×</button></div><div id="modal-step-1"><form id="amount-form"><label for="amount-input">Сума в USD</label><input type="number" id="amount-input" min="1" step="1" placeholder="напр. 15" required><button type="submit" class="btn btn-primary" style="width:100%">Перейти до оплати</button></form></div><div id="modal-step-2" class="hidden"><p id="payment-info">Для завершення операції, будь ласка, оплатіть через PayPal.</p><div id="paypal-button-container"></div><p id="payment-status" style="text-align:center;margin-top:1rem"></p></div></div></div>
+    <div class="page-container">
+        <aside class="sidebar">
+            <!-- Sidebar content (no changes) -->
+            <a href="/wallet/" class="sidebar-header">
+                <svg class="logo-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path></svg>
+                <span class="logo-text">SCR</span>
+            </a>
+            <ul class="nav-menu">
+                <li class="nav-item active"><a href="/wallet/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg></span><span class="nav-text">Гаманець</span></a></li>
+                <li class="nav-item"><a href="/transactions/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></span><span class="nav-text">Транзакції</span></a></li>
+                <li class="nav-item"><a href="/rates/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg></span><span class="nav-text">Курси</span></a></li>
+                <li class="nav-item"><a href="/settings/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></span><span class="nav-text">Налаштування</span></a></li>
+            </ul>
+            <div class="user-profile">
+                <button id="logout-button" title="Вийти з акаунту"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></span><span class="nav-text">Вийти</span></button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="page-header">
+                <h1>Гаманець</h1>
+                <!-- === НОВИЙ ЕЛЕМЕНТ: Кнопка для мобільного меню === -->
+                <button class="sidebar-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
+            </header>
+            <div class="dashboard-grid">
+                <div class="balance-card">
+                    <p class="balance-title">Загальний баланс</p>
+                    <h2 class="balance-amount"><div class="skeleton"></div></h2>
+                    <div class="action-buttons">
+                        <button id="deposit-btn" class="btn btn-primary">Поповнити</button>
+                        <button class="btn btn-secondary" onclick="alert('Функція виводу коштів у розробці.')">Вивести</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- === НОВИЙ ЕЛЕМЕНТ: Оверлей для затемнення фону === -->
+    <div class="overlay"></div>
+
+    <div class="modal-overlay" id="deposit-modal">
+        <!-- Modal content (no changes) -->
+        <div class="modal-content"><div class="modal-header"><h3>Поповнити баланс</h3><button class="modal-close-btn" id="modal-close">×</button></div><div id="modal-step-1"><form id="amount-form"><label for="amount-input">Сума в USD</label><input type="number" id="amount-input" min="1" step="1" placeholder="напр. 15" required><button type="submit" class="btn btn-primary" style="width:100%">Перейти до оплати</button></form></div><div id="modal-step-2" class="hidden"><p id="payment-info">Для завершення операції, будь ласка, оплатіть через PayPal.</p><div id="paypal-button-container"></div><p id="payment-status" style="text-align:center;margin-top:1rem"></p></div></div>
+    </div>
     
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         const user = netlifyIdentity.currentUser();
         if (!user) { window.location.replace('/'); return; }
 
+        // --- Елементи сторінки ---
         const balanceAmountEl = document.querySelector('.balance-amount');
         const depositBtn = document.getElementById('deposit-btn');
         const depositModal = document.getElementById('deposit-modal');
@@ -31,23 +258,28 @@
         const amountInput = document.getElementById('amount-input');
         const paymentStatus = document.getElementById('payment-status');
         const paypalContainer = document.getElementById('paypal-button-container');
+        const logoutButton = document.getElementById('logout-button');
 
-        // === ЗМІНА 1: Функція для відображення балансу ===
+        // === НОВИЙ БЛОК: Логіка для мобільного меню (з settings.html) ===
+        const sidebarToggle = document.querySelector('.sidebar-toggle');
+        const overlay = document.querySelector('.overlay');
+        const toggleSidebar = () => document.body.classList.toggle('sidebar-open');
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
+        // === КІНЕЦЬ НОВОГО БЛОКУ ===
+
+        // --- Логіка балансу та поповнення (без функціональних змін) ---
         const displayBalance = (balanceValue) => {
             balanceAmountEl.innerHTML = `<span>${(Number(balanceValue) || 0).toFixed(2)} SCR</span>`;
         };
         
-        // === ЗМІНА 2: Завантажуємо баланс з user_metadata ===
         const loadBalance = async () => {
             try {
-                // Оновлюємо токен, щоб отримати найсвіжіші дані
                 await user.jwt(true); 
                 const latestUser = netlifyIdentity.currentUser();
-                // Читаємо баланс з user_metadata, як і на сторінці налаштувань
                 displayBalance(latestUser?.user_metadata?.balance);
             } catch (error) {
                 console.error("Не вдалося оновити дані користувача:", error);
-                // В разі помилки, показуємо старі дані
                 displayBalance(user?.user_metadata?.balance);
             }
         };
@@ -83,13 +315,9 @@
         const renderPayPalButtons = (amount) => {
             paypal.Buttons({
                 createOrder: (data, actions) => actions.order.create({ purchase_units: [{ amount: { value: amount, currency_code: 'USD' } }] }),
-                
-                // === ЗМІНА 3: Повністю переписана логіка onApprove ===
                 onApprove: async (data, actions) => {
                     paymentStatus.textContent = 'Перевірка платежу...';
-                    
                     try {
-                        // Крок 1: Викликаємо нашу функцію для верифікації платежу
                         const response = await fetch('/.netlify/functions/update-balance', {
                             method: 'POST',
                             headers: {
@@ -98,32 +326,21 @@
                             },
                             body: JSON.stringify({ orderID: data.orderID })
                         });
-                        
                         const result = await response.json();
-
                         if (!response.ok) {
                             throw new Error(result.error || 'Помилка перевірки платежу.');
                         }
-
-                        // Крок 2: Отримуємо сплачену суму від нашої функції
                         const amountPaid = result.amountPaid;
                         paymentStatus.textContent = `Платіж успішний! Оновлюємо баланс...`;
-
-                        // Крок 3: Оновлюємо баланс на клієнті
                         const currentUser = netlifyIdentity.currentUser();
                         const currentBalance = Number(currentUser.user_metadata?.balance) || 0;
                         const newBalance = currentBalance + amountPaid;
-                        
-                        // Використовуємо user.update() для збереження нового балансу
                         const updatedUser = await currentUser.update({
                             data: { balance: newBalance }
                         });
-
-                        // Крок 4: Повідомляємо про успіх і оновлюємо UI
                         paymentStatus.textContent = `Баланс успішно поповнено!`;
-                        displayBalance(updatedUser.user_metadata.balance); // Показуємо новий баланс
+                        displayBalance(updatedUser.user_metadata.balance);
                         setTimeout(closeModal, 3000);
-
                     } catch (err) {
                         console.error('Помилка обробки платежу:', err);
                         paymentStatus.textContent = `Помилка: ${err.message}`;
@@ -136,7 +353,6 @@
             }).render('#paypal-button-container');
         };
 
-        const logoutButton = document.getElementById('logout-button');
         logoutButton.addEventListener('click', () => netlifyIdentity.logout());
         netlifyIdentity.on('logout', () => window.location.replace('/'));
     });
