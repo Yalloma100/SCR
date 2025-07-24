@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Гаманець - SCR</title>
-    <script src="https://www.paypal.com/sdk/js?client-id=ASJIOL6y24xuwQiCC-a8RBkVypAp5VuYLf7cXEIzc4aLV5yYEXDVvellq-OGQQfZjkqJBZh1h0JqS9mU&currency=USD"></script>
+        <script src="https://www.paypal.com/sdk/js?client-id=ASJIOL6y24xuwQiCC-a8RBkVypAp5VuYLf7cXEIzc4aLV5yYEXDVvellq-OGQQfZjkqJBZh1h0JqS9mU&currency=USD"></script>
     <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,25 +40,11 @@
             try {
                 await user.jwt(true);
                 const latestUser = netlifyIdentity.currentUser();
-
-                // !! ДІАГНОСТИЧНА ЗМІНА !!
-                // Спробуємо розпарсити JSON з поля full_name
-                let balance = 0;
-                const fullNameData = latestUser?.user_metadata?.full_name;
-                if (typeof fullNameData === 'string' && fullNameData.includes('{')) {
-                    try {
-                        const parsedData = JSON.parse(fullNameData);
-                        balance = parsedData.balance || 0;
-                    } catch (e) {
-                        // Якщо це не JSON, баланс залишається 0
-                        console.error("Поле full_name не є валідним JSON.");
-                    }
-                }
-                displayBalance(balance);
-
+                // Читаємо баланс з безпечного місця
+                displayBalance(latestUser?.app_metadata?.balance);
             } catch (error) {
                 console.error("Не вдалося оновити дані користувача:", error);
-                displayBalance(0); // Якщо помилка, показуємо 0
+                displayBalance(user?.app_metadata?.balance);
             }
         };
         
@@ -99,12 +85,13 @@
                     return fetch('/.netlify/functions/update-balance', {
                         method: 'POST',
                         headers: {
+                            // Передаємо токен користувача для аутентифікації
                             'Authorization': `Bearer ${user.token.access_token}`,
                             'Content-Type': 'application/json',
                         },
+                        // Більше не потрібно передавати userId, функція візьме його з контексту
                         body: JSON.stringify({ 
-                            orderID: data.orderID,
-                            userId: user.id 
+                            orderID: data.orderID
                         })
                     })
                     .then(res => {
