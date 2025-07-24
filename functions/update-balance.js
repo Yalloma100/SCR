@@ -25,14 +25,12 @@ async function getPaypalAccessToken(clientId, clientSecret) {
 }
 
 exports.handler = async (event, context) => {
-    // 1. Перевірка, чи авторизований користувач (захист функції)
     const { user } = context.clientContext;
     if (!user) {
         return { statusCode: 401, body: JSON.stringify({ error: 'Ви не авторизовані для виконання цієї дії.' }) };
     }
 
     try {
-        // 2. Отримуємо дані від клієнта
         const { orderID, userId } = JSON.parse(event.body);
         if (!orderID || !userId) {
             return { statusCode: 400, body: JSON.stringify({ error: 'Відсутній ID замовлення або ID користувача.' }) };
@@ -40,7 +38,6 @@ exports.handler = async (event, context) => {
         
         console.log(`Функція викликана для користувача: ${user.email} (ID: ${userId})`);
 
-        // 3. Обробка платежу PayPal
         const paypalToken = await getPaypalAccessToken(PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET);
         const orderResponse = await fetch(`https://api.sandbox.paypal.com/v2/checkout/orders/${orderID}`, {
             headers: { 'Authorization': `Bearer ${paypalToken}` }
@@ -54,7 +51,6 @@ exports.handler = async (event, context) => {
         const amountPaid = parseFloat(orderData.purchase_units[0].amount.value);
         console.log(`Платіж успішний. Сума: ${amountPaid} USD`);
 
-        // 4. Оновлення балансу в Netlify
         const currentBalance = user.app_metadata.balance || 0;
         const newBalance = currentBalance + amountPaid;
         console.log(`Оновлення балансу: з ${currentBalance} на ${newBalance}`);
@@ -76,14 +72,13 @@ exports.handler = async (event, context) => {
         });
 
         if (!updateUserResponse.ok) {
-            const errorBody = await updateUserResponse.json(); // Отримуємо JSON з помилкою
+            const errorBody = await updateUserResponse.json();
             console.error("Помилка оновлення користувача в Netlify:", errorBody);
             throw new Error(`Не вдалося оновити баланс. Відповідь Netlify: ${JSON.stringify(errorBody)}`);
         }
         
         console.log("Баланс користувача в Netlify успішно оновлено.");
 
-        // 5. Повернення успішної відповіді клієнту
         return {
             statusCode: 200,
             body: JSON.stringify({ success: true, newBalance: newBalance }),
