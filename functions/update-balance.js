@@ -69,7 +69,7 @@ exports.handler = async (event, context) => {
         const newBalance = currentBalance + amountPaid;
         console.log(`Оновлення балансу: з ${currentBalance} на ${newBalance}`);
 
-        const netlifyAPI = `https://api.netlify.com/api/v1/users/${user.sub}`;
+        const netlifyAPI = `https://api.netlify.com/api/v1/identity/users/${user.id}`;
         const updateUserResponse = await fetch(netlifyAPI, {
             method: 'PUT',
             headers: { 'Authorization': `Bearer ${NETLIFY_API_TOKEN}`, 'Content-Type': 'application/json' },
