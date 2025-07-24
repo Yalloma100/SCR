@@ -3,7 +3,7 @@
 const fetch = require('node-fetch');
 
 // !! КРОК 2: ВСТАВТЕ СЮДИ ВАШ НОВИЙ ТОКЕН, ЗГЕНЕРОВАНИЙ НА КРОЦІ 1 !!
-const NETLIFY_API_TOKEN    = "nfp_4NAD5LYanv1mgtUKojBjYaapBpHdkKCsbdab"; 
+const NETLIFY_API_TOKEN    = "nfp_AMftYBRVkTJa7BzWuCuLEnY97ys9ezqAf941"; 
 // ---------------------------------------------------
 
 // Ваші ключі PayPal залишаються без змін
@@ -66,6 +66,7 @@ exports.handler = async (event, context) => {
                 'Content-Type': 'application/json' 
             },
             body: JSON.stringify({
+                // ВИКОРИСТОВУЄМО БЕЗПЕЧНЕ СХОВИЩЕ
                 app_metadata: { 
                     ...user.app_metadata, 
                     balance: newBalance 
@@ -74,7 +75,6 @@ exports.handler = async (event, context) => {
         });
 
         if (!updateUserResponse.ok) {
-            // Цього разу ми очікуємо JSON, оскільки endpoint правильний
             const errorBody = await updateUserResponse.json();
             console.error("Помилка оновлення користувача в Netlify:", errorBody);
             throw new Error(`Не вдалося оновити баланс. Відповідь Netlify: ${JSON.stringify(errorBody)}`);
