@@ -1,4 +1,5 @@
 <!-- Шлях до файлу: /wallet/index.html -->
+
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -6,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Гаманець - SCR</title>
     
-    <script src="https://www.paypal.com/sdk/js?client-id=ASJIOL6y24xuwQiCC-a8RBkVypAp5VuYLf7cXEIzc4aLV5yYEXDVvellq-OGQQfZjkqJBZh1h0JqS9mU&currency=USD"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=ASJIOL6y24xuwQiCC-a8RBkVypAp5VuYLf7cXEIzc4aLV5yYEXDVvellq-OGQQfZjkqJBZh1h0JqS9mU¤cy=USD"></script>
     <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -73,7 +74,7 @@
 </head>
 <body>
     <div class="page-container">
-        <!-- Сайдбар залишається без змін -->
+        <!-- Ваш HTML для сайдбару залишається без змін -->
         <aside class="sidebar">
             <a href="/wallet/" class="sidebar-header"><svg class="logo-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path></svg><span class="logo-text">SCR</span></a>
             <ul class="nav-menu">
@@ -104,9 +105,6 @@
         </div>
     </div>
 
-    <!-- ================================================= -->
-    <!--          ФІНАЛЬНИЙ JAVASCRIPT БЛОК              -->
-    <!-- ================================================= -->
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         const user = netlifyIdentity.currentUser();
@@ -129,11 +127,10 @@
             try {
                 await user.jwt(true);
                 const latestUser = netlifyIdentity.currentUser();
-                // ✅ ВИПРАВЛЕННЯ: Читаємо з user_metadata
-                displayBalance(latestUser?.user_metadata?.balance);
+                displayBalance(latestUser?.app_metadata?.balance);
             } catch (error) {
                 console.error("Не вдалося оновити дані користувача:", error);
-                displayBalance(user?.user_metadata?.balance);
+                displayBalance(user?.app_metadata?.balance);
             }
         };
         
