@@ -2,11 +2,10 @@
 
 const fetch = require('node-fetch');
 
-// !! КРОК 2: ВСТАВТЕ СЮДИ ВАШ НОВИЙ ТОКЕН, ЗГЕНЕРОВАНИЙ НА КРОЦІ 1 !!
-const NETLIFY_API_TOKEN    = "nfp_AMftYBRVkTJa7BzWuCuLEnY97ys9ezqAf941"; 
+// Ваш старий токен, який ми тестуємо
+const NETLIFY_API_TOKEN    = "nfp_Hv9X1JNB9EqRxxLMB2YCnaUgzcL1GLoA6620"; 
 // ---------------------------------------------------
 
-// Ваші ключі PayPal залишаються без змін
 const PAYPAL_CLIENT_ID     = "ASJIOL6y24xuwQiCC-a8RBkVypAp5VuYLf7cXEIzc4aLV5yYEXDVvellq-OGQQfZjkqJBZh1h0JqS9mU";
 const PAYPAL_CLIENT_SECRET = "EJ4fJwwhV6PIVwQBJkvXSPRf8OWm6sVLYPXgQpqr4_GuMN_PIaaDpevPGg4AR-VlRu2Uly7x4NmsdGeY";
 
@@ -52,11 +51,11 @@ exports.handler = async (event, context) => {
         const amountPaid = parseFloat(orderData.purchase_units[0].amount.value);
         console.log(`Платіж успішний. Сума: ${amountPaid} USD`);
 
-        const currentBalance = user.app_metadata.balance || 0;
+        // ДІАГНОСТИЧНА ЗМІНА: Читаємо з user_metadata
+        const currentBalance = user.user_metadata.balance || 0;
         const newBalance = currentBalance + amountPaid;
-        console.log(`Оновлення балансу: з ${currentBalance} на ${newBalance}`);
+        console.log(`Оновлення балансу (в user_metadata): з ${currentBalance} на ${newBalance}`);
 
-        // ВИКОРИСТОВУЄМО ПРАВИЛЬНИЙ ENDPOINT БЕЗ /identity
         const netlifyAPIUrl = `https://api.netlify.com/api/v1/users/${userId}`;
         
         const updateUserResponse = await fetch(netlifyAPIUrl, {
@@ -66,9 +65,9 @@ exports.handler = async (event, context) => {
                 'Content-Type': 'application/json' 
             },
             body: JSON.stringify({
-                // ВИКОРИСТОВУЄМО БЕЗПЕЧНЕ СХОВИЩЕ
-                app_metadata: { 
-                    ...user.app_metadata, 
+                // ДІАГНОСТИЧНА ЗМІНА: Записуємо в user_metadata, зберігаючи існуючі дані
+                user_metadata: { 
+                    ...user.user_metadata, 
                     balance: newBalance 
                 } 
             })
@@ -80,7 +79,7 @@ exports.handler = async (event, context) => {
             throw new Error(`Не вдалося оновити баланс. Відповідь Netlify: ${JSON.stringify(errorBody)}`);
         }
         
-        console.log("Баланс користувача в Netlify успішно оновлено.");
+        console.log("Баланс користувача в Netlify (user_metadata) успішно оновлено.");
 
         return {
             statusCode: 200,
