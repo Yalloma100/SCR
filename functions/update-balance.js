@@ -3,7 +3,7 @@
 const fetch = require('node-fetch');
 
 // !! КРОК 2: ВСТАВТЕ СЮДИ ВАШ НОВИЙ ТОКЕН, ЗГЕНЕРОВАНИЙ НА КРОЦІ 1 !!
-const NETLIFY_API_TOKEN    = "ВСТАВТЕ_ВАШ_НОВИЙ_ТОКЕН_ТУТ"; 
+const NETLIFY_API_TOKEN    = "nfp_4NAD5LYanv1mgtUKojBjYaapBpHdkKCsbdab"; 
 // ---------------------------------------------------
 
 // Ваші ключі PayPal залишаються без змін
