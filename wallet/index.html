@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Гаманець - SCR</title>
-        <script src="https://www.paypal.com/sdk/js?client-id=ASJIOL6y24xuwQiCC-a8RBkVypAp5VuYLf7cXEIzc4aLV5yYEXDVvellq-OGQQfZjkqJBZh1h0JqS9mU&currency=USD"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=ASJIOL6y24xuwQiCC-a8RBkVypAp5VuYLf7cXEIzc4aLV5yYEXDVvellq-OGQQfZjkqJBZh1h0JqS9mU¤cy=USD"></script>
     <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,19 +32,23 @@
         const paymentStatus = document.getElementById('payment-status');
         const paypalContainer = document.getElementById('paypal-button-container');
 
+        // === ЗМІНА 1: Функція для відображення балансу ===
         const displayBalance = (balanceValue) => {
             balanceAmountEl.innerHTML = `<span>${(Number(balanceValue) || 0).toFixed(2)} SCR</span>`;
         };
         
+        // === ЗМІНА 2: Завантажуємо баланс з user_metadata ===
         const loadBalance = async () => {
             try {
-                await user.jwt(true);
+                // Оновлюємо токен, щоб отримати найсвіжіші дані
+                await user.jwt(true); 
                 const latestUser = netlifyIdentity.currentUser();
-                // Читаємо баланс з безпечного місця
-                displayBalance(latestUser?.app_metadata?.balance);
+                // Читаємо баланс з user_metadata, як і на сторінці налаштувань
+                displayBalance(latestUser?.user_metadata?.balance);
             } catch (error) {
                 console.error("Не вдалося оновити дані користувача:", error);
-                displayBalance(user?.app_metadata?.balance);
+                // В разі помилки, показуємо старі дані
+                displayBalance(user?.user_metadata?.balance);
             }
         };
         
@@ -79,34 +83,51 @@
         const renderPayPalButtons = (amount) => {
             paypal.Buttons({
                 createOrder: (data, actions) => actions.order.create({ purchase_units: [{ amount: { value: amount, currency_code: 'USD' } }] }),
-                onApprove: (data, actions) => {
-                    paymentStatus.textContent = 'Обробка платежу...';
+                
+                // === ЗМІНА 3: Повністю переписана логіка onApprove ===
+                onApprove: async (data, actions) => {
+                    paymentStatus.textContent = 'Перевірка платежу...';
                     
-                    return fetch('/.netlify/functions/update-balance', {
-                        method: 'POST',
-                        headers: {
-                            // Передаємо токен користувача для аутентифікації
-                            'Authorization': `Bearer ${user.token.access_token}`,
-                            'Content-Type': 'application/json',
-                        },
-                        // Більше не потрібно передавати userId, функція візьме його з контексту
-                        body: JSON.stringify({ 
-                            orderID: data.orderID
-                        })
-                    })
-                    .then(res => {
-                        if (!res.ok) { return res.json().then(err => { throw new Error(err.error || `Сервер відповів зі статусом ${res.status}`) }); }
-                        return res.json();
-                    })
-                    .then(result => {
-                        paymentStatus.textContent = `Оплата успішна! Ваш новий баланс: ${result.newBalance.toFixed(2)} SCR`;
-                        loadBalance();
+                    try {
+                        // Крок 1: Викликаємо нашу функцію для верифікації платежу
+                        const response = await fetch('/.netlify/functions/update-balance', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${user.token.access_token}`,
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ orderID: data.orderID })
+                        });
+                        
+                        const result = await response.json();
+
+                        if (!response.ok) {
+                            throw new Error(result.error || 'Помилка перевірки платежу.');
+                        }
+
+                        // Крок 2: Отримуємо сплачену суму від нашої функції
+                        const amountPaid = result.amountPaid;
+                        paymentStatus.textContent = `Платіж успішний! Оновлюємо баланс...`;
+
+                        // Крок 3: Оновлюємо баланс на клієнті
+                        const currentUser = netlifyIdentity.currentUser();
+                        const currentBalance = Number(currentUser.user_metadata?.balance) || 0;
+                        const newBalance = currentBalance + amountPaid;
+                        
+                        // Використовуємо user.update() для збереження нового балансу
+                        const updatedUser = await currentUser.update({
+                            data: { balance: newBalance }
+                        });
+
+                        // Крок 4: Повідомляємо про успіх і оновлюємо UI
+                        paymentStatus.textContent = `Баланс успішно поповнено!`;
+                        displayBalance(updatedUser.user_metadata.balance); // Показуємо новий баланс
                         setTimeout(closeModal, 3000);
-                    })
-                    .catch(err => {
+
+                    } catch (err) {
                         console.error('Помилка обробки платежу:', err);
                         paymentStatus.textContent = `Помилка: ${err.message}`;
-                    });
+                    }
                 },
                 onError: (err) => {
                     console.error('Помилка кнопок PayPal:', err);
