@@ -2,11 +2,12 @@
 
 const fetch = require('node-fetch');
 
-// Ваші ключі залишаються незмінними.
+// !! КРОК 2: ВСТАВТЕ СЮДИ ВАШ НОВИЙ ТОКЕН !!
+const NETLIFY_API_TOKEN    = "nfp_4NAD5LYanv1mgtUKojBjYaapBpHdkKCsbdab"; 
+// ---------------------------------------------------
+
 const PAYPAL_CLIENT_ID     = "ASJIOL6y24xuwQiCC-a8RBkVypAp5VuYLf7cXEIzc4aLV5yYEXDVvellq-OGQQfZjkqJBZh1h0JqS9mU";
 const PAYPAL_CLIENT_SECRET = "EJ4fJwwhV6PIVwQBJkvXSPRf8OWm6sVLYPXgQpqr4_GuMN_PIaaDpevPGg4AR-VlRu2Uly7x4NmsdGeY";
-const NETLIFY_API_TOKEN    = "nfp_Hv9X1JNB9EqRxxLMB2YCnaUgzcL1GLoA6620";
-// ---------------------------------------------------
 
 async function getPaypalAccessToken(clientId, clientSecret) {
     const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
@@ -24,20 +25,22 @@ async function getPaypalAccessToken(clientId, clientSecret) {
 }
 
 exports.handler = async (event, context) => {
+    // 1. Перевірка, чи авторизований користувач (захист функції)
     const { user } = context.clientContext;
     if (!user) {
         return { statusCode: 401, body: JSON.stringify({ error: 'Ви не авторизовані для виконання цієї дії.' }) };
     }
 
     try {
-        // !! НОВЕ ВИПРАВЛЕННЯ !!: Отримуємо userId, переданий від клієнта
+        // 2. Отримуємо дані від клієнта
         const { orderID, userId } = JSON.parse(event.body);
         if (!orderID || !userId) {
             return { statusCode: 400, body: JSON.stringify({ error: 'Відсутній ID замовлення або ID користувача.' }) };
         }
         
-        console.log(`Функція викликана для користувача: ${user.email} (ID, отриманий від клієнта: ${userId})`);
+        console.log(`Функція викликана для користувача: ${user.email} (ID: ${userId})`);
 
+        // 3. Обробка платежу PayPal
         const paypalToken = await getPaypalAccessToken(PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET);
         const orderResponse = await fetch(`https://api.sandbox.paypal.com/v2/checkout/orders/${orderID}`, {
             headers: { 'Authorization': `Bearer ${paypalToken}` }
@@ -51,11 +54,11 @@ exports.handler = async (event, context) => {
         const amountPaid = parseFloat(orderData.purchase_units[0].amount.value);
         console.log(`Платіж успішний. Сума: ${amountPaid} USD`);
 
+        // 4. Оновлення балансу в Netlify
         const currentBalance = user.app_metadata.balance || 0;
         const newBalance = currentBalance + amountPaid;
         console.log(`Оновлення балансу: з ${currentBalance} на ${newBalance}`);
 
-        // !! ГОЛОВНЕ ВИПРАВЛЕННЯ !!: Використовуємо ID, отриманий з тіла запиту
         const netlifyAPIUrl = `https://api.netlify.com/api/v1/users/${userId}`;
         
         const updateUserResponse = await fetch(netlifyAPIUrl, {
@@ -73,13 +76,14 @@ exports.handler = async (event, context) => {
         });
 
         if (!updateUserResponse.ok) {
-            const errorBody = await updateUserResponse.json();
+            const errorBody = await updateUserResponse.json(); // Отримуємо JSON з помилкою
             console.error("Помилка оновлення користувача в Netlify:", errorBody);
             throw new Error(`Не вдалося оновити баланс. Відповідь Netlify: ${JSON.stringify(errorBody)}`);
         }
         
         console.log("Баланс користувача в Netlify успішно оновлено.");
 
+        // 5. Повернення успішної відповіді клієнту
         return {
             statusCode: 200,
             body: JSON.stringify({ success: true, newBalance: newBalance }),
