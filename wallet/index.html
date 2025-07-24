@@ -40,12 +40,25 @@
             try {
                 await user.jwt(true);
                 const latestUser = netlifyIdentity.currentUser();
-                // ДІАГНОСТИЧНА ЗМІНА: Читаємо з user_metadata
-                displayBalance(latestUser?.user_metadata?.balance);
+
+                // !! ДІАГНОСТИЧНА ЗМІНА !!
+                // Спробуємо розпарсити JSON з поля full_name
+                let balance = 0;
+                const fullNameData = latestUser?.user_metadata?.full_name;
+                if (typeof fullNameData === 'string' && fullNameData.includes('{')) {
+                    try {
+                        const parsedData = JSON.parse(fullNameData);
+                        balance = parsedData.balance || 0;
+                    } catch (e) {
+                        // Якщо це не JSON, баланс залишається 0
+                        console.error("Поле full_name не є валідним JSON.");
+                    }
+                }
+                displayBalance(balance);
+
             } catch (error) {
                 console.error("Не вдалося оновити дані користувача:", error);
-                // ДІАГНОСТИЧНА ЗМІНА: Читаємо з user_metadata
-                displayBalance(user?.user_metadata?.balance);
+                displayBalance(0); // Якщо помилка, показуємо 0
             }
         };
         
