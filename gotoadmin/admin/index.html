@@ -206,7 +206,7 @@
                 }
                 sessionStorage.setItem('isAdmin', 'true');
                 showAdminPanel();
-                loadAdminData();
+                await loadAdminData();
             } catch (error) {
                 loginError.textContent = error.message;
             } finally {
