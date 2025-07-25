@@ -1,13 +1,13 @@
-// Шлях до файлу: /functions/update-balance.js
-
+// /functions/update-balance.js
 const fetch = require('node-fetch');
+const { performTransactionalUpdate } = require('./db-manager');
 
-const PAYPAL_CLIENT_ID     = "ASJIOL6y24xuwQiCC-a8RBkVypAp5VuYLf7cXEIzc4aLV5yYEXDVvellq-OGQQfZjkqJBZh1h0JqS9mU";
-const PAYPAL_CLIENT_SECRET = "EJ4fJwwhV6PIVwQBJkvXSPRf8OWm6sVLYPXgQpqr4_GuMN_PIaaDpevPGg4AR-VlRu2Uly7x4NmsdGeY";
+const PAYPAL_CLIENT_ID     = process.env.PAYPAL_CLIENT_ID;
+const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET;
 
-// Функція для отримання токена PayPal залишається без змін
-async function getPaypalAccessToken(clientId, clientSecret) {
-    const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+// Функція для отримання токена PayPal
+async function getPaypalAccessToken() {
+    const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`).toString('base64');
     const response = await fetch('https://api.sandbox.paypal.com/v1/oauth2/token', {
         method: 'POST',
         headers: { 'Authorization': `Basic ${auth}`, 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -26,6 +26,8 @@ exports.handler = async (event, context) => {
     if (!context.clientContext.user) {
         return { statusCode: 401, body: JSON.stringify({ error: 'Ви не авторизовані.' }) };
     }
+    const userId = context.clientContext.user.sub;
+    const user = context.clientContext.user;
 
     try {
         const { orderID } = JSON.parse(event.body);
@@ -34,7 +36,7 @@ exports.handler = async (event, context) => {
         }
         
         // Перевіряємо платіж PayPal
-        const paypalToken = await getPaypalAccessToken(PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET);
+        const paypalToken = await getPaypalAccessToken();
         const orderResponse = await fetch(`https://api.sandbox.paypal.com/v2/checkout/orders/${orderID}`, {
             headers: { 'Authorization': `Bearer ${paypalToken}` }
         });
@@ -46,9 +48,21 @@ exports.handler = async (event, context) => {
 
         // Отримуємо сплачену суму
         const amountPaid = parseFloat(orderData.purchase_units[0].amount.value);
-        console.log(`Платіж успішний. Сума: ${amountPaid} USD`);
+        
+        // Оновлюємо баланс транзакційно в users.json
+        await performTransactionalUpdate('users.json', (usersData) => {
+            if (!usersData[userId]) {
+                usersData[userId] = {
+                    email: user.email,
+                    full_name: user.user_metadata.full_name || 'Ім\'я не вказано',
+                    balance: 0,
+                    purchases: []
+                };
+            }
+            usersData[userId].balance += amountPaid;
+            return usersData;
+        });
 
-        // Повертаємо тільки суму платежу
         return {
             statusCode: 200,
             body: JSON.stringify({ success: true, amountPaid: amountPaid }),
