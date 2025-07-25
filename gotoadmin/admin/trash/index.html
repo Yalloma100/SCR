@@ -45,6 +45,13 @@
         .btn-secondary { background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border-color); }
         .btn-danger { background: var(--danger-color); color: white; }
         .btn-success { background: var(--success-color); color: white; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1200; opacity: 0; visibility: hidden; transition: opacity .3s, visibility .3s; }
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        .modal-content { background-color: var(--bg-sidebar); border-radius: 16px; padding: 2rem; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-weight: 500; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.9rem; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; font-size: 1rem; background-color: var(--bg-input); color: var(--text-primary); transition: all 0.2s ease; font-family: 'Inter', sans-serif; }
     </style>
 </head>
 <body>
@@ -77,6 +84,25 @@
         </main>
     </div>
 
+    <div id="edit-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="edit-modal-title">Редагувати вкладення</h3>
+                <button class="btn modal-close-btn">×</button>
+            </div>
+            <form id="edit-form">
+                <input type="hidden" id="edit-id">
+                <div class="form-group"><label for="edit-title">Назва</label><input type="text" id="edit-title" required></div>
+                <div class="form-group"><label for="edit-description">Опис</label><textarea id="edit-description" rows="3" required></textarea></div>
+                <div class="form-group"><label for="edit-price">Ціна (USD)</label><input type="number" id="edit-price" min="0" step="0.01" required></div>
+                <div class="form-group"><label for="edit-imageUrl">URL зображення</label><input type="url" id="edit-imageUrl" required></div>
+                <div class="form-group"><label for="edit-changeType">Тип зміни</label><select id="edit-changeType"><option value="none">Без змін</option><option value="up">Ріст</option><option value="down">Падіння</option></select></div>
+                <div class="form-group"><label for="edit-changeValue">Значення зміни</label><input type="text" id="edit-changeValue" placeholder="напр. 2.5%"></div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Зберегти</button>
+            </form>
+        </div>
+    </div>
+
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         if (!sessionStorage.getItem('isAdmin')) {
@@ -87,13 +113,18 @@
         const trashListContainer = document.getElementById('trash-list');
         const themeToggleBtn = document.getElementById('theme-toggle-btn');
         const logoutButton = document.getElementById('logout-button');
+        const editModal = document.getElementById('edit-modal');
+        const editForm = document.getElementById('edit-form');
+
+        let allTrashItems = [];
 
         const renderTrash = (items) => {
             trashListContainer.innerHTML = '';
-            if (items.length === 0) {
+            if (!items || items.length === 0) {
                 trashListContainer.innerHTML = '<p>Кошик порожній.</p>';
                 return;
             }
+            allTrashItems = items; // Зберігаємо для доступу при редагуванні
             items.forEach(item => {
                 const el = document.createElement('div');
                 el.className = 'trash-item';
@@ -104,6 +135,7 @@
                         <span>${item.price} USD</span>
                     </div>
                     <div class="actions">
+                        <button class="btn btn-secondary edit-btn" data-id="${item.id}">Редагувати</button>
                         <button class="btn btn-success restore-btn" data-id="${item.id}">Відновити</button>
                         <button class="btn btn-danger delete-btn" data-id="${item.id}">Видалити</button>
                     </div>
@@ -115,15 +147,45 @@
         const loadTrash = async () => {
             trashListContainer.innerHTML = '<p>Завантаження...</p>';
             try {
-                // Використовуємо get-investments, але вкажемо, що треба файл trash.json
-                // Для цього треба або окрему функцію get-trash.js, або модифікувати db-manager
-                // Створимо функцію get-trash.js для чистоти коду (її треба буде створити на сервері)
                 const response = await fetch('/.netlify/functions/get-trash'); 
                 if (!response.ok) throw new Error('Не вдалося завантажити кошик.');
                 const data = await response.json();
                 renderTrash(data);
             } catch (error) {
                 trashListContainer.innerHTML = `<p style="color:var(--danger-color);">${error.message}</p>`;
+            }
+        };
+        
+        const openEditModal = (item) => {
+            editModal.classList.add('visible');
+            editModal.querySelector('#edit-id').value = item.id;
+            editModal.querySelector('#edit-title').value = item.title;
+            editModal.querySelector('#edit-description').value = item.description;
+            editModal.querySelector('#edit-price').value = item.price;
+            editModal.querySelector('#edit-imageUrl').value = item.imageUrl;
+            editModal.querySelector('#edit-changeType').value = item.change?.type || 'none';
+            editModal.querySelector('#edit-changeValue').value = item.change?.value || '';
+        };
+
+        const handleEditFormSubmit = async (e) => {
+            e.preventDefault();
+            const id = editModal.querySelector('#edit-id').value;
+            const data = {
+                title: editModal.querySelector('#edit-title').value,
+                description: editModal.querySelector('#edit-description').value,
+                price: parseFloat(editModal.querySelector('#edit-price').value),
+                imageUrl: editModal.querySelector('#edit-imageUrl').value,
+                change: { type: editModal.querySelector('#edit-changeType').value, value: editModal.querySelector('#edit-changeValue').value }
+            };
+            data.id = id;
+
+            try {
+                const response = await fetch('/.netlify/functions/update-archived-investment', { method: 'POST', body: JSON.stringify(data) });
+                if (!response.ok) throw new Error('Не вдалося зберегти зміни.');
+                editModal.classList.remove('visible');
+                loadTrash();
+            } catch (error) {
+                alert(error.message);
             }
         };
 
@@ -157,9 +219,14 @@
                 handleRestore(id);
             } else if (button.classList.contains('delete-btn')) {
                 handleDelete(id);
+            } else if (button.classList.contains('edit-btn')) {
+                const item = allTrashItems.find(i => i.id === id);
+                if (item) openEditModal(item);
             }
         });
-
+        
+        editForm.addEventListener('submit', handleEditFormSubmit);
+        editModal.querySelector('.modal-close-btn').addEventListener('click', () => editModal.classList.remove('visible'));
         themeToggleBtn.addEventListener('click', () => { document.documentElement.classList.toggle('light-theme'); localStorage.setItem('theme', document.documentElement.classList.contains('light-theme') ? 'light' : 'dark'); });
         logoutButton.addEventListener('click', () => { sessionStorage.removeItem('isAdmin'); window.location.replace('/gotoadmin/admin/'); });
 
