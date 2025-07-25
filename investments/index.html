@@ -29,7 +29,7 @@
         body.no-scroll { overflow: hidden; }
         
         .page-container { display: grid; grid-template-columns: var(--sidebar-width-expanded) 1fr; min-height: 100vh; }
-        .sidebar { background-color: var(--bg-sidebar); backdrop-filter: blur(10px); border-right: 1px solid var(--border-color); padding: 1.5rem; display: flex; flex-direction: column; position: fixed; left: 0; top: 0; height: 100%; width: var(--sidebar-width-expanded); z-index: 1100; }
+        .sidebar { background-color: var(--bg-sidebar); backdrop-filter: blur(10px); border-right: 1px solid var(--border-color); padding: 1.5rem; display: flex; flex-direction: column; position: fixed; left: 0; top: 0; height: 100%; width: var(--sidebar-width-expanded); z-index: 1100; transition: transform 0.3s ease-in-out; }
         .sidebar-header { display: flex; align-items: center; margin-bottom: 2.5rem; color: var(--text-primary); text-decoration: none; }
         .logo-icon { width: 30px; height: 30px; }
         .logo-text { font-size: 1.5rem; font-weight: 700; margin-left: 1rem; }
@@ -44,7 +44,7 @@
         .page-header { position: sticky; top: 0; grid-column: 2 / 3; display: flex; justify-content: space-between; align-items: center; padding: 1rem 2.5rem; height: 72px; z-index: 1000; background-color: var(--bg-header); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); }
         .main-content { grid-column: 2 / 3; padding: 2.5rem; }
         
-        .search-wrapper { position: relative; margin-bottom: 2rem; max-width: 400px; }
+        .search-wrapper { position: relative; margin-bottom: 2rem; max-width: 400px; width: 100%; }
         .search-wrapper svg { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary); }
         #search-input { width: 100%; padding: 0.8rem 1rem 0.8rem 3rem; background-color: var(--bg-input); border: 1px solid var(--border-color); border-radius: 999px; color: var(--text-primary); font-size: 1rem; }
         
@@ -52,7 +52,8 @@
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
             gap: 1.5rem; 
-            /* ВИДАЛЕНО: align-content: start; */
+            align-content: start; /* ВИПРАВЛЕНО: Вирівнює елементи догори */
+            width: 100%;
         }
         .investment-card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer; }
         .investment-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px var(--shadow-color); }
@@ -91,6 +92,23 @@
         #confirm-purchase-btn { width: 100%; }
         #modal-status { text-align: center; margin-top: 1rem; font-weight: 500; min-height: 20px;}
         .hidden { display: none; }
+        
+        /* ДОДАНО: Стилі для мобільної навігації */
+        .mobile-nav-toggle { display: none; }
+        .sidebar-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: var(--bg-overlay);
+            z-index: 1099;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .sidebar-overlay.is-active {
+            opacity: 1;
+            visibility: visible;
+        }
 
         @media (max-width: 900px) {
             .details-content { grid-template-columns: 1fr; gap: 2rem; margin-top: 6rem; padding-top: 2rem; }
@@ -98,8 +116,32 @@
         }
         @media (max-width: 768px) {
             .page-container { grid-template-columns: 1fr; }
-            .sidebar { transform: translateX(-100%); }
+            .sidebar { 
+                transform: translateX(-100%);
+                box-shadow: 0 0 40px rgba(0,0,0,0.5);
+            }
+            .sidebar.is-open {
+                transform: translateX(0);
+            }
             .main-content { padding: 1.5rem; }
+            .page-header {
+                padding: 1rem 1.5rem;
+                justify-content: flex-start;
+                gap: 1rem;
+            }
+            .page-header h1 {
+                font-size: 1.25rem;
+            }
+            .mobile-nav-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: transparent;
+                border: none;
+                color: var(--text-primary);
+                cursor: pointer;
+                padding: 0;
+            }
         }
     </style>
 </head>
@@ -120,8 +162,15 @@
                  <button class="footer-btn" id="logout-button" title="Вийти з акаунту"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></span><span class="nav-text">Вийти</span></button>
             </div>
         </aside>
+        <div class="sidebar-overlay"></div>
 
-        <header class="page-header"><h1>Вкладення</h1></header>
+        <header class="page-header">
+            <!-- ДОДАНО: Кнопка "Гамбургер" для мобільного меню -->
+            <button class="mobile-nav-toggle" aria-label="Відкрити меню">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+            <h1>Вкладення</h1>
+        </header>
 
         <main class="main-content">
             <div class="search-wrapper">
@@ -182,6 +231,12 @@
         const confirmPurchaseBtn = document.getElementById('confirm-purchase-btn');
         const detailsView = document.getElementById('investment-details-view');
         const logoutButton = document.querySelector('#logout-button');
+        
+        // ДОДАНО: Елементи для мобільної навігації
+        const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarOverlay = document.querySelector('.sidebar-overlay');
+        const navLinks = document.querySelectorAll('.sidebar .nav-item a');
 
         let allInvestments = [];
         let userPurchases = [];
@@ -354,6 +409,27 @@
             }).render(container);
         };
         
+        // ДОДАНО: Функціонал для мобільного меню
+        function closeMobileMenu() {
+            sidebar.classList.remove('is-open');
+            sidebarOverlay.classList.remove('is-active');
+            document.body.classList.remove('no-scroll');
+        }
+
+        if (mobileNavToggle) {
+            mobileNavToggle.addEventListener('click', () => {
+                const isOpen = sidebar.classList.toggle('is-open');
+                sidebarOverlay.classList.toggle('is-active', isOpen);
+                document.body.classList.toggle('no-scroll', isOpen);
+            });
+        }
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', closeMobileMenu);
+        }
+        navLinks.forEach(link => {
+            link.addEventListener('click', closeMobileMenu);
+        });
+
         grid.addEventListener('click', (e) => {
             const card = e.target.closest('.investment-card');
             if (!card) return;
