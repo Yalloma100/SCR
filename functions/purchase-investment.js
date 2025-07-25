@@ -2,18 +2,16 @@
 const fetch = require('node-fetch');
 const { performTransactionalUpdate } = require('./db-manager');
 
-// Беремо токен з змінних оточення
 const { NETLIFY_API_TOKEN } = process.env;
 
 exports.handler = async (event, context) => {
-    // Отримуємо користувача з контексту - це правильний серверний спосіб
     const { user } = context.clientContext;
     if (!user) {
         return { statusCode: 401, body: JSON.stringify({ error: 'Ви не авторизовані.' }) };
     }
 
     const { investmentId, price } = JSON.parse(event.body);
-    const userId = user.sub; // ID користувача Netlify
+    const userId = user.sub;
 
     try {
         let finalBalance;
@@ -21,50 +19,50 @@ exports.handler = async (event, context) => {
         // Крок 1: Транзакційно оновлюємо наш users.json на GitHub
         await performTransactionalUpdate('users.json', (usersData) => {
             if (!usersData[userId]) {
-                // Якщо користувача немає в нашій БД, створюємо запис з його поточним балансом з Netlify
+                // ВИПРАВЛЕНО: Якщо користувача немає в нашій БД, беремо його баланс з Netlify
+                const initialBalance = user.user_metadata?.balance || 0;
                 usersData[userId] = { 
-                    balance: user.user_metadata.balance || 0, 
+                    balance: initialBalance, 
                     purchases: [] 
                 };
             }
 
             const currentBalance = usersData[userId].balance;
             if (currentBalance < price) {
-                // Сигнал фронтенду, що коштів недостатньо
                 throw { name: 'InsufficientFunds', required: price, balance: currentBalance };
             }
 
-            // Списуємо гроші та додаємо покупку
             usersData[userId].balance -= price;
             usersData[userId].purchases.push(investmentId);
-            finalBalance = usersData[userId].balance; // Зберігаємо новий баланс
+            finalBalance = usersData[userId].balance;
 
             return usersData;
         });
 
-        // Крок 2: Оновлюємо баланс безпосередньо в Netlify Identity через API
-        // Це правильний серверний спосіб оновлення метаданих
+        // Крок 2: Оновлюємо баланс в Netlify Identity через API
         const url = `https://api.netlify.com/api/v1/users/${userId}`;
+        
+        // ВИПРАВЛЕНО: Створюємо метадані безпечно, навіть якщо їх не було
+        const newMetaData = {
+            ...(user.user_metadata || {}), // Якщо user_metadata не існує, використовуємо порожній об'єкт
+            balance: finalBalance
+        };
+
         const response = await fetch(url, {
             method: 'PUT',
             headers: { 
                 'Authorization': `Bearer ${NETLIFY_API_TOKEN}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                user_metadata: {
-                    ...user.user_metadata, // Копіюємо існуючі метадані, щоб не затерти їх
-                    balance: finalBalance // Оновлюємо тільки баланс
-                }
-            })
+            body: JSON.stringify({ user_metadata: newMetaData }) // Відправляємо безпечно створений об'єкт
         });
 
         if (!response.ok) {
             const errorText = await response.text();
-            throw new Error(`Не вдалося оновити баланс в Netlify: ${errorText}`);
+            // Надаємо більш детальну помилку для діагностики
+            throw new Error(`Не вдалося оновити баланс в Netlify. Статус: ${response.status}. Повідомлення: ${errorText}`);
         }
 
-        // Повертаємо успішну відповідь
         return {
             statusCode: 200,
             body: JSON.stringify({ success: true, newBalance: finalBalance }),
@@ -73,15 +71,15 @@ exports.handler = async (event, context) => {
     } catch (error) {
         if (error.name === 'InsufficientFunds') {
             return {
-                statusCode: 402, // Payment Required
+                statusCode: 402,
                 body: JSON.stringify({
                     error: 'Недостатньо коштів',
-                    shortfall: error.required - error.balance
+                    shortfall: (error.required - error.balance).toFixed(2)
                 }),
             };
         }
         
-        console.error("Помилка покупки:", error);
+        console.error("Критична помилка покупки:", error);
         return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
     }
 };
