@@ -19,17 +19,19 @@
     </script>
     <style>
         :root {
-            --primary-color: #9333ea; --primary-glow: rgba(147, 51, 234, 0.4); --success-color: #22c55e; --success-glow: rgba(34, 197, 94, 0.4); --danger-color: #ef4444; --danger-glow: rgba(239, 68, 68, 0.4); --bg-main: #020617; --bg-sidebar: rgba(12, 19, 34, 0.85); --bg-header: rgba(2, 6, 23, 0.7); --bg-card: rgba(15, 23, 42, 0.6); --text-primary: #f8fafc; --text-secondary: #94a3b8; --border-color: rgba(51, 65, 85, 0.5); --shadow-color: rgba(0, 0, 0, 0.2); --sidebar-width-expanded: 260px; --bg-overlay: rgba(0, 0, 0, 0.7);
+            --primary-color: #9333ea; --primary-glow: rgba(147, 51, 234, 0.4); --success-color: #22c55e; --danger-color: #ef4444; --bg-main: #020617; --bg-sidebar: rgba(12, 19, 34, 0.85); --bg-header: rgba(2, 6, 23, 0.7); --bg-card: rgba(15, 23, 42, 0.6); --text-primary: #f8fafc; --text-secondary: #94a3b8; --border-color: rgba(51, 65, 85, 0.5); --shadow-color: rgba(0, 0, 0, 0.2); --sidebar-width-expanded: 260px; --bg-overlay: rgba(0, 0, 0, 0.7); --bg-input: rgba(15, 23, 42, 0.5);
         }
         html.light-theme {
-            --primary-color: #8b5cf6; --primary-glow: rgba(139, 92, 246, 0.3); --success-color: #16a34a; --success-glow: rgba(22, 163, 74, 0.3); --danger-color: #dc2626; --danger-glow: rgba(220, 38, 38, 0.3); --bg-main: #f1f5f9; --bg-sidebar: rgba(255, 255, 255, 0.8); --bg-header: rgba(255, 255, 255, 0.7); --bg-card: #ffffff; --text-primary: #1e293b; --text-secondary: #64748b; --border-color: #e2e8f0; --shadow-color: rgba(45, 55, 72, 0.1);
+            --primary-color: #8b5cf6; --success-color: #16a34a; --danger-color: #dc2626; --bg-main: #f1f5f9; --bg-sidebar: rgba(255, 255, 255, 0.8); --bg-header: rgba(255, 255, 255, 0.7); --bg-card: #ffffff; --text-primary: #1e293b; --text-secondary: #64748b; --border-color: #e2e8f0; --shadow-color: rgba(45, 55, 72, 0.1); --bg-input: #f8fafc;
         }
         *, ::after, ::before { box-sizing: border-box; }
         body, html { margin: 0; font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: var(--text-primary); }
+        body.no-scroll { overflow: hidden; }
+        
         .page-container { display: grid; grid-template-columns: var(--sidebar-width-expanded) 1fr; min-height: 100vh; }
         .sidebar { background-color: var(--bg-sidebar); backdrop-filter: blur(10px); border-right: 1px solid var(--border-color); padding: 1.5rem; display: flex; flex-direction: column; position: fixed; left: 0; top: 0; height: 100%; width: var(--sidebar-width-expanded); z-index: 1100; }
         .sidebar-header { display: flex; align-items: center; margin-bottom: 2.5rem; color: var(--text-primary); text-decoration: none; }
-        .logo-icon { width: 30px; height: 30px; flex-shrink: 0; }
+        .logo-icon { width: 30px; height: 30px; }
         .logo-text { font-size: 1.5rem; font-weight: 700; margin-left: 1rem; }
         .nav-menu { list-style: none; padding: 0; margin: 0; flex-grow: 1; }
         .nav-item a { display: flex; align-items: center; padding: .8rem 1rem; color: var(--text-secondary); text-decoration: none; border-radius: 8px; margin-bottom: .5rem; font-weight: 500; }
@@ -38,26 +40,43 @@
         .nav-text { white-space: nowrap; }
         .sidebar-footer { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border-color); }
         .footer-btn { background: none; border: none; width: 100%; display: flex; align-items: center; padding: .8rem 1rem; color: var(--text-secondary); font-size: 1rem; font-weight: 500; cursor: pointer; border-radius: 8px; }
+        
         .page-header { position: sticky; top: 0; grid-column: 2 / 3; display: flex; justify-content: space-between; align-items: center; padding: 1rem 2.5rem; height: 72px; z-index: 1000; background-color: var(--bg-header); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); }
         .main-content { grid-column: 2 / 3; padding: 2.5rem; }
-        .investments-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
-        .investment-card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.3s, box-shadow 0.3s; }
+        
+        .search-wrapper { position: relative; margin-bottom: 2rem; max-width: 400px; }
+        .search-wrapper svg { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary); }
+        #search-input { width: 100%; padding: 0.8rem 1rem 0.8rem 3rem; background-color: var(--bg-input); border: 1px solid var(--border-color); border-radius: 999px; color: var(--text-primary); font-size: 1rem; }
+        
+        .investments-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; align-content: start; }
+        .investment-card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer; }
         .investment-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px var(--shadow-color); }
-        .investment-card .card-image { width: 100%; height: 180px; object-fit: cover; }
-        .investment-card .card-content { padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column; }
-        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
-        .card-header h3 { margin: 0; font-size: 1.25rem; }
+        .investment-card .card-image { width: 100%; height: 160px; object-fit: cover; }
+        .investment-card .card-content { padding: 1.25rem; flex-grow: 1; display: flex; flex-direction: column; }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
+        .card-header h3 { margin: 0; font-size: 1.1rem; }
+        .card-footer { margin-top: 1rem; display: flex; justify-content: space-between; align-items: center; }
+        .price { font-weight: 600; font-size: 1.1rem; }
         .rate-change { font-weight: 600; display: inline-flex; align-items: center; }
         .rate-change.positive { color: var(--success-color); }
         .rate-change.negative { color: var(--danger-color); }
-        .card-description { color: var(--text-secondary); margin-bottom: 1.5rem; flex-grow: 1; }
-        .card-footer { display: flex; justify-content: space-between; align-items: center; }
-        .price { font-size: 1.5rem; font-weight: 700; }
-        .btn { padding: 0.6rem 1.2rem; font-size: 0.9rem; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; transition: all 0.2s; }
+        
+        .investment-details-view { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-main); z-index: 2000; overflow-y: auto; opacity: 0; visibility: hidden; transition: opacity .4s ease, visibility .4s ease; }
+        .investment-details-view.visible { opacity: 1; visibility: visible; }
+        .details-close-btn { position: fixed; top: 2rem; right: 2rem; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-primary); width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2001; transition: transform .2s; }
+        .details-close-btn:hover { transform: scale(1.1); }
+        .details-content { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; max-width: 1200px; margin: 0 auto; padding: 8rem 2rem; align-items: center; }
+        .details-image { width: 100%; border-radius: 16px; box-shadow: 0 10px 40px var(--shadow-color); }
+        .details-info h1 { font-size: 3rem; margin-top: 0; margin-bottom: 0.5rem; }
+        .details-info .price { font-size: 2rem; font-weight: 700; color: var(--primary-color); margin-bottom: 2rem; }
+        .details-info p { color: var(--text-secondary); line-height: 1.7; font-size: 1.1rem; }
+        
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.6rem 1.2rem; font-size: 0.9rem; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; transition: all 0.2s; }
         .btn-primary { background-image: linear-gradient(120deg, var(--primary-color) 0%, #8b5cf6 100%); color: white; }
         .btn:disabled { opacity: 0.7; cursor: not-allowed; }
         .btn-success { background-color: var(--success-color); color: white; cursor: default; }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1200; opacity: 0; visibility: hidden; transition: opacity .3s; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 2100; opacity: 0; visibility: hidden; transition: opacity .3s, visibility .3s; }
         .modal-overlay.visible { opacity: 1; visibility: visible; }
         .modal-content { background-color: var(--bg-sidebar); border-radius: 16px; padding: 2rem; width: 90%; max-width: 420px; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
@@ -67,7 +86,16 @@
         #confirm-purchase-btn { width: 100%; }
         #modal-status { text-align: center; margin-top: 1rem; font-weight: 500; min-height: 20px;}
         .hidden { display: none; }
-        .new-items-notification { background-color: var(--success-color); color: white; padding: 1rem; text-align: center; border-radius: 8px; margin-bottom: 1.5rem; font-weight: 500; }
+
+        @media (max-width: 900px) {
+            .details-content { grid-template-columns: 1fr; gap: 2rem; margin-top: 6rem; padding-top: 2rem; }
+            .details-info h1 { font-size: 2rem; }
+        }
+        @media (max-width: 768px) {
+            .page-container { grid-template-columns: 1fr; }
+            .sidebar { transform: translateX(-100%); }
+            .main-content { padding: 1.5rem; }
+        }
     </style>
 </head>
 <body>
@@ -87,13 +115,20 @@
                  <button class="footer-btn" id="logout-button" title="Вийти з акаунту"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></span><span class="nav-text">Вийти</span></button>
             </div>
         </aside>
+
         <header class="page-header"><h1>Вкладення</h1></header>
+
         <main class="main-content">
+            <div class="search-wrapper">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>
+                <input type="text" id="search-input" placeholder="Пошук за назвою...">
+            </div>
             <div id="investments-grid" class="investments-grid">
                 <p>Завантаження вкладень...</p>
             </div>
         </main>
     </div>
+
     <div id="purchase-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -113,42 +148,55 @@
         </div>
     </div>
     
+    <div id="investment-details-view" class="investment-details-view">
+        <button id="details-close-btn" class="details-close-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>
+        </button>
+        <div class="details-content">
+            <div class="details-image-container">
+                <img id="details-image" src="" alt="" class="details-image">
+            </div>
+            <div class="details-info">
+                <h1 id="details-title"></h1>
+                <p class="price" id="details-price"></p>
+                <p id="details-description"></p>
+                <button id="details-buy-btn" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.2rem;"></button>
+            </div>
+        </div>
+    </div>
+    
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         const user = netlifyIdentity.currentUser();
         if (!user) { window.location.replace('/'); return; }
 
         const grid = document.getElementById('investments-grid');
-        const modal = document.getElementById('purchase-modal');
-        const modalCloseBtn = modal.querySelector('.modal-close-btn');
+        const searchInput = document.getElementById('search-input');
+        const purchaseModal = document.getElementById('purchase-modal');
+        const purchaseModalCloseBtn = purchaseModal.querySelector('.modal-close-btn');
         const confirmPurchaseBtn = document.getElementById('confirm-purchase-btn');
+        const detailsView = document.getElementById('investment-details-view');
         const logoutButton = document.querySelector('#logout-button');
 
-        let currentInvestment = null;
+        let allInvestments = [];
+        let userPurchases = [];
         let userBalance = 0;
-
-        const renderCards = (investments, userPurchaseIds) => {
+        let currentInvestment = null;
+        
+        const renderCards = (investmentsToRender, userPurchaseIds) => {
             const purchaseIdSet = new Set(userPurchaseIds);
-            grid.innerHTML = ''; // Очищуємо перед рендерингом
+            grid.innerHTML = '';
             
-            const lastVisit = localStorage.getItem('lastVisit');
-            const newItems = investments.filter(inv => !lastVisit || new Date(inv.createdAt) > new Date(lastVisit));
-            if (newItems.length > 0 && grid.querySelector('.new-items-notification') === null) {
-                const notification = document.createElement('div');
-                notification.className = 'new-items-notification';
-                notification.textContent = `З'явилося ${newItems.length} нових вкладень!`;
-                grid.prepend(notification);
-            }
-
-            if (!investments || investments.length === 0) {
-                grid.insertAdjacentHTML('beforeend', '<p>Наразі немає доступних вкладень.</p>');
+            if (investmentsToRender.length === 0) {
+                grid.innerHTML = '<p>Нічого не знайдено.</p>';
                 return;
             }
 
-            investments.forEach(inv => {
+            investmentsToRender.forEach(inv => {
                 const isPurchased = purchaseIdSet.has(inv.id);
                 const card = document.createElement('div');
                 card.className = 'investment-card';
+                card.dataset.id = inv.id;
                 card.innerHTML = `
                     <img src="${inv.imageUrl}" alt="${inv.title}" class="card-image">
                     <div class="card-content">
@@ -159,15 +207,9 @@
                                 ${inv.change.value}
                             </span>` : ''}
                         </div>
-                        <p class="card-description">${inv.description}</p>
                         <div class="card-footer">
                             <span class="price">${inv.price} USD</span>
-                            <button 
-                                class="btn ${isPurchased ? 'btn-success' : 'btn-primary'}" 
-                                ${isPurchased ? 'disabled' : ''}
-                                data-id="${inv.id}" data-price="${inv.price}" data-title="${inv.title}">
-                                ${isPurchased ? 'Куплено' : 'Вкласти'}
-                            </button>
+                            ${isPurchased ? `<span style="font-weight:600; color:var(--success-color);">Куплено</span>` : ''}
                         </div>
                     </div>
                 `;
@@ -187,47 +229,78 @@
                     throw new Error(err.error || 'Не вдалося завантажити дані.');
                 }
                 const data = await response.json();
-                const purchaseIds = data.userPurchaseIds.map(p => p.investmentId); // Отримуємо тільки ID
-                renderCards(data.investments, purchaseIds);
+                allInvestments = data.investments;
+                userPurchases = data.userPurchaseIds;
                 userBalance = data.balance;
-                
-                // Оновлюємо мітку часу після успішного завантаження
-                localStorage.setItem('lastVisit', new Date().toISOString());
-
+                const purchaseIds = userPurchases.map(p => p.investmentId);
+                renderCards(allInvestments, purchaseIds);
             } catch (error) {
                 grid.innerHTML = `<p style="color:var(--danger-color);">${error.message}</p>`;
             }
         };
 
-        const openModal = (inv) => {
-            currentInvestment = inv;
-            document.getElementById('modal-title').textContent = `Вкладення в "${inv.title}"`;
-            document.getElementById('balance-info').textContent = `Ваш баланс: ${(userBalance || 0).toFixed(2)} USD`;
-            document.getElementById('modal-status').textContent = '';
-            document.getElementById('step-1').classList.remove('hidden');
-            document.getElementById('step-2').classList.add('hidden');
-            modal.classList.add('visible');
+        const openPurchaseModal = () => {
+            purchaseModal.querySelector('#modal-title').textContent = `Покупка "${currentInvestment.title}"`;
+            purchaseModal.querySelector('#balance-info').textContent = `Ваш баланс: ${(userBalance || 0).toFixed(2)} USD`;
+            purchaseModal.querySelector('#modal-status').textContent = '';
+            purchaseModal.querySelector('#step-1').classList.remove('hidden');
+            purchaseModal.querySelector('#step-2').classList.add('hidden');
+            purchaseModal.classList.add('visible');
         };
-
-        const closeModal = () => {
-            modal.classList.remove('visible');
-            currentInvestment = null;
+        const closePurchaseModal = () => {
+            purchaseModal.classList.remove('visible');
         };
         
+        const openDetailsView = (investmentId) => {
+            const investment = allInvestments.find(inv => inv.id === investmentId);
+            if (!investment) return;
+            
+            currentInvestment = investment;
+            
+            detailsView.querySelector('#details-image').src = investment.imageUrl;
+            detailsView.querySelector('#details-title').textContent = investment.title;
+            detailsView.querySelector('#details-price').textContent = `${investment.price} USD`;
+            detailsView.querySelector('#details-description').textContent = investment.description;
+            
+            const buyBtn = detailsView.querySelector('#details-buy-btn');
+            const isPurchased = userPurchases.some(p => p.investmentId === investmentId);
+            
+            if (isPurchased) {
+                buyBtn.textContent = 'Вже куплено';
+                buyBtn.disabled = true;
+                buyBtn.classList.remove('btn-primary');
+                buyBtn.classList.add('btn-success');
+            } else {
+                buyBtn.textContent = 'Вкласти';
+                buyBtn.disabled = false;
+                buyBtn.classList.remove('btn-success');
+                buyBtn.classList.add('btn-primary');
+            }
+
+            document.body.classList.add('no-scroll');
+            detailsView.classList.add('visible');
+        };
+
+        const closeDetailsView = () => {
+            document.body.classList.remove('no-scroll');
+            detailsView.classList.remove('visible');
+            currentInvestment = null;
+        };
+
         const handlePurchase = async () => {
             const price = currentInvestment.price;
-            const statusEl = document.getElementById('modal-status');
+            const statusEl = purchaseModal.querySelector('#modal-status');
             statusEl.textContent = 'Обробка...';
             confirmPurchaseBtn.disabled = true;
 
             try {
                 if (userBalance < price) {
                     const shortfall = price - userBalance;
-                    document.getElementById('step-1').classList.add('hidden');
-                    document.getElementById('step-2').classList.remove('hidden');
-                    document.getElementById('paypal-info').textContent = `Для покупки не вистачає ${shortfall.toFixed(2)} USD. Будь ласка, поповніть баланс.`;
+                    purchaseModal.querySelector('#step-1').classList.add('hidden');
+                    purchaseModal.querySelector('#step-2').classList.remove('hidden');
+                    purchaseModal.querySelector('#paypal-info').textContent = `Для покупки не вистачає ${shortfall.toFixed(2)} USD. Будь ласка, поповніть баланс.`;
                     renderPayPalButtons(shortfall);
-                    return; // Зупиняємо виконання, чекаємо на поповнення
+                    return;
                 }
 
                 const token = user.token.access_token;
@@ -240,8 +313,11 @@
                 if (!response.ok) throw new Error(result.error);
                 
                 statusEl.textContent = 'Успішно куплено!';
-                await loadData(); // Перезавантажуємо всі дані
-                setTimeout(closeModal, 1500);
+                await loadData();
+                setTimeout(() => {
+                    closePurchaseModal();
+                    closeDetailsView();
+                }, 1500);
 
             } catch (error) {
                 statusEl.textContent = `Помилка: ${error.message}`;
@@ -251,14 +327,14 @@
         };
         
         const renderPayPalButtons = (amount) => {
-            const container = document.getElementById('paypal-button-container');
+            const container = purchaseModal.querySelector('#paypal-button-container');
             container.innerHTML = '';
             paypal.Buttons({
                 createOrder: (data, actions) => actions.order.create({
                     purchase_units: [{ amount: { value: amount.toFixed(2), currency_code: 'USD' } }]
                 }),
                 onApprove: async (data, actions) => {
-                    document.getElementById('modal-status').textContent = 'Платіж успішний, оновлюємо баланс...';
+                    purchaseModal.querySelector('#modal-status').textContent = 'Платіж успішний, оновлюємо баланс...';
                     await fetch('/.netlify/functions/update-balance', {
                         method: 'POST',
                         headers: { 'Authorization': `Bearer ${user.token.access_token}`, 'Content-Type': 'application/json' },
@@ -267,22 +343,32 @@
                     
                     alert('Баланс поповнено! Тепер ви можете завершити покупку.');
                     await loadData();
-                    closeModal();
+                    closePurchaseModal();
+                    closeDetailsView();
                 }
             }).render(container);
         };
-
+        
         grid.addEventListener('click', (e) => {
-            const btn = e.target.closest('button');
-            if (!btn || btn.disabled) return;
-            openModal({
-                id: btn.dataset.id,
-                price: parseFloat(btn.dataset.price),
-                title: btn.dataset.title,
-            });
+            const card = e.target.closest('.investment-card');
+            if (!card) return;
+            openDetailsView(card.dataset.id);
         });
 
-        modalCloseBtn.addEventListener('click', closeModal);
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filtered = allInvestments.filter(inv => inv.title.toLowerCase().includes(searchTerm));
+            renderCards(filtered, userPurchases.map(p => p.investmentId));
+        });
+        
+        detailsView.querySelector('#details-close-btn').addEventListener('click', closeDetailsView);
+        detailsView.querySelector('#details-buy-btn').addEventListener('click', () => {
+            if (currentInvestment && !detailsView.querySelector('#details-buy-btn').disabled) {
+                openPurchaseModal();
+            }
+        });
+        
+        purchaseModalCloseBtn.addEventListener('click', closePurchaseModal);
         confirmPurchaseBtn.addEventListener('click', handlePurchase);
         logoutButton.addEventListener('click', () => { netlifyIdentity.logout(); });
         netlifyIdentity.on('logout', () => { window.location.replace('/'); });
