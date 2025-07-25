@@ -1,60 +1,63 @@
 // /functions/purchase-investment.js
+const fetch = require('node-fetch');
 const { performTransactionalUpdate } = require('./db-manager');
-const netlifyIdentity = require('netlify-identity-widget'); // Це умовно, на сервері доступ до юзера інший
+
+const { NETLIFY_API_TOKEN } = process.env;
 
 exports.handler = async (event, context) => {
-    // Перевірка авторизації користувача
     const { user } = context.clientContext;
     if (!user) {
         return { statusCode: 401, body: JSON.stringify({ error: 'Ви не авторизовані.' }) };
     }
 
     const { investmentId, price } = JSON.parse(event.body);
-    const userId = user.sub; // Netlify User ID
+    const userId = user.sub;
+    const userEmail = user.email; // Нам потрібен email для оновлення метаданих
 
-    // Оновлюємо дані користувача транзакційно
     try {
-        const newUserData = await performTransactionalUpdate('users.json', (usersData) => {
-            // Перевіряємо, чи існує користувач, якщо ні - створюємо
+        let finalBalance;
+
+        // Транзакційно оновлюємо users.json
+        await performTransactionalUpdate('users.json', (usersData) => {
             if (!usersData[userId]) {
                 usersData[userId] = { balance: 0, purchases: [] };
             }
 
-            // Логіка перевірки балансу
-            const userBalance = usersData[userId].balance;
-            if (userBalance < price) {
-                // Це не помилка, а сигнал фронтенду, що треба ініціювати оплату
-                throw { 
-                    name: 'InsufficientFunds', 
-                    required: price, 
-                    balance: userBalance 
-                };
+            const currentBalance = usersData[userId].balance;
+            if (currentBalance < price) {
+                throw { name: 'InsufficientFunds', required: price, balance: currentBalance };
             }
 
-            // Списуємо гроші та додаємо покупку
             usersData[userId].balance -= price;
             usersData[userId].purchases.push(investmentId);
+            finalBalance = usersData[userId].balance; // Зберігаємо фінальний баланс
 
             return usersData;
         });
-        
-        // Оновлюємо баланс в Netlify Identity теж!
-        const adminUser = netlifyIdentity.admin();
-        await adminUser.updateUserById(userId, { 
-            user_metadata: { balance: newUserData[userId].balance }
+
+        // Оновлюємо баланс в Netlify Identity
+        const url = `https://api.netlify.com/api/v1/users/${userId}`;
+        await fetch(url, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${NETLIFY_API_TOKEN}` },
+            body: JSON.stringify({
+                user_metadata: {
+                    ...user.user_metadata, // Копіюємо існуючі метадані
+                    balance: finalBalance
+                }
+            })
         });
 
         return {
             statusCode: 200,
-            body: JSON.stringify({ success: true, newBalance: newUserData[userId].balance }),
+            body: JSON.stringify({ success: true, newBalance: finalBalance }),
         };
 
     } catch (error) {
-        // Обробка нашого кастомного "винятку"
         if (error.name === 'InsufficientFunds') {
-             return {
+            return {
                 statusCode: 402, // Payment Required
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     error: 'Недостатньо коштів',
                     shortfall: error.required - error.balance
                 }),
