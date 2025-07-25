@@ -8,15 +8,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <script>
         (function() {
             const theme = localStorage.getItem('theme') || 'dark';
             if (theme === 'light') document.documentElement.classList.add('light-theme');
         })();
     </script>
+
     <style>
         :root {
-            --primary-color: #9333ea; --primary-glow: rgba(147, 51, 234, 0.4); --success-color: #22c55e; --danger-color: #ef4444; --bg-main: #020617; --bg-sidebar: rgba(12, 19, 34, 0.85); --bg-header: rgba(2, 6, 23, 0.7); --bg-card: rgba(15, 23, 42, 0.6); --bg-input: rgba(15, 23, 42, 0.5); --text-primary: #f8fafc; --text-secondary: #94a3b8; --border-color: rgba(51, 65, 85, 0.5); --border-focus: rgba(147, 51, 234, 0.8); --shadow-color: rgba(0, 0, 0, 0.2); --sidebar-width-expanded: 280px;
+            --primary-color: #9333ea; --primary-glow: rgba(147, 51, 234, 0.4); --success-color: #22c55e; --danger-color: #ef4444; --bg-main: #020617; --bg-sidebar: rgba(12, 19, 34, 0.85); --bg-header: rgba(2, 6, 23, 0.7); --bg-card: rgba(15, 23, 42, 0.6); --bg-input: rgba(15, 23, 42, 0.5); --text-primary: #f8fafc; --text-secondary: #94a3b8; --border-color: rgba(51, 65, 85, 0.5); --border-focus: rgba(147, 51, 234, 0.8); --shadow-color: rgba(0, 0, 0, 0.2); --bg-overlay: rgba(0, 0, 0, 0.7);
         }
         html.light-theme {
             --primary-color: #8b5cf6; --primary-glow: rgba(139, 92, 246, 0.3); --success-color: #16a34a; --danger-color: #dc2626; --bg-main: #f1f5f9; --bg-sidebar: rgba(255, 255, 255, 0.8); --bg-header: rgba(255, 255, 255, 0.7); --bg-card: #ffffff; --bg-input: #f8fafc; --text-primary: #1e293b; --text-secondary: #64748b; --border-color: #e2e8f0; --border-focus: #a78bfa; --shadow-color: rgba(45, 55, 72, 0.1);
@@ -28,32 +30,41 @@
         .login-wrapper { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; }
         .login-card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem 2.5rem; max-width: 400px; width: 100%; box-shadow: 0 8px 32px var(--shadow-color); backdrop-filter: blur(12px); }
         .login-card h1 { text-align: center; margin-bottom: 2rem; }
+        
+        .page-container { display: flex; min-height: 100vh; background-color: var(--bg-main); }
+        .sidebar { width: 320px; flex-shrink: 0; background-color: var(--bg-card); padding: 2rem; display: flex; flex-direction: column; border-right: 1px solid var(--border-color); }
+        .sidebar h3 { margin-top: 0; }
+        .main-content { flex-grow: 1; display: flex; flex-direction: column; }
+        .header { padding: 1.5rem 2.5rem; border-bottom: 1px solid var(--border-color); backdrop-filter: blur(10px); }
+        .header h1 { margin: 0; }
+        .content-area { padding: 2.5rem; }
+        
         .form-group { margin-bottom: 1rem; }
-        .form-group label { display: block; font-weight: 500; margin-bottom: 0.5rem; color: var(--text-secondary); }
+        .form-group label { display: block; font-weight: 500; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.9rem; }
         .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; font-size: 1rem; background-color: var(--bg-input); color: var(--text-primary); transition: all 0.2s ease; font-family: 'Inter', sans-serif; }
         .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--primary-glow); }
-        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; transition: all 0.2s; }
-        .btn-primary { background-image: linear-gradient(120deg, var(--primary-color) 0%, #8b5cf6 100%); color: white; }
-        .btn-danger { background-color: var(--danger-color); color: white; }
-        #login-error { color: var(--danger-color); text-align: center; margin-top: 1rem; min-height: 20px; font-weight: 500; }
 
-        .page-container { display: grid; grid-template-columns: var(--sidebar-width-expanded) 1fr; min-height: 100vh; }
-        .sidebar { background-color: var(--bg-sidebar); backdrop-filter: blur(10px); border-right: 1px solid var(--border-color); padding: 1.5rem; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100%; width: var(--sidebar-width-expanded); z-index: 1100; }
-        .sidebar-header { display: flex; align-items: center; margin-bottom: 2.5rem; }
-        .page-header { position: sticky; top: 0; grid-column: 2 / 3; display: flex; align-items: center; padding: 1rem 2.5rem; height: 72px; z-index: 1000; background-color: var(--bg-header); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); }
-        .main-content { grid-column: 2 / 3; padding: 2.5rem; display: grid; grid-template-columns: 1fr 2fr; gap: 2.5rem; align-items: flex-start; }
-        .content-card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; }
-        .investment-list-item { display: flex; align-items: center; gap: 1rem; padding: 1rem; border-bottom: 1px solid var(--border-color); }
-        .investment-list-item:last-child { border-bottom: none; }
-        .investment-list-item img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; }
-        .investment-info { flex-grow: 1; }
-        .investment-info strong { display: block; font-size: 1.1rem; }
-        .investment-info span { color: var(--text-secondary); font-size: 0.9rem; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; font-size: 0.9rem; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; transition: all 0.2s; }
+        .btn-primary { background-image: linear-gradient(120deg, var(--primary-color) 0%, #8b5cf6 100%); color: white; }
+        
+        .investment-list { margin-top: 2rem; }
+        .investment-item { display: grid; grid-template-columns: 60px 1fr auto; gap: 1rem; align-items: center; padding: 1rem; margin: 0 -1rem; border-radius: 8px; cursor: pointer; transition: background-color .2s; }
+        .investment-item:hover { background-color: rgba(147, 51, 234, .07); }
+        .investment-item img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; }
+        .investment-item .info strong { display: block; }
+        .investment-item .info span { color: var(--text-secondary); font-size: 0.9rem; }
+        .investment-item .stats { text-align: right; }
+        .investment-item .stats strong { font-size: 1.2rem; display: block; }
+        .investment-item .stats span { font-size: 0.8rem; color: var(--text-secondary); }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1200; opacity: 0; visibility: hidden; transition: opacity .3s; }
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        .modal-content { background-color: var(--bg-sidebar); border-radius: 16px; padding: 2rem; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
     </style>
 </head>
 <body>
 
-    <!-- Login Form -->
     <div id="login-section" class="login-wrapper">
         <div class="login-card">
             <h1>Вхід в Панель Адміністратора</h1>
@@ -61,46 +72,42 @@
                 <div class="form-group"><label for="username">Логін</label><input type="text" id="username" required></div>
                 <div class="form-group"><label for="password">Пароль</label><input type="password" id="password" required></div>
                 <button type="submit" class="btn btn-primary" style="width: 100%;">Увійти</button>
-                <p id="login-error"></p>
             </form>
         </div>
     </div>
 
-    <!-- Admin Panel -->
     <div id="admin-panel" class="page-container hidden">
         <aside class="sidebar">
-            <div class="sidebar-header">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path></svg>
-                <span style="font-size: 1.5rem; font-weight: 700; margin-left: 1rem;">Admin</span>
-            </div>
+            <h3>Додати вкладення</h3>
+            <form id="add-investment-form">
+                <div class="form-group"><label for="title">Назва</label><input type="text" id="title" required></div>
+                <div class="form-group"><label for="description">Опис</label><textarea id="description" rows="3" required></textarea></div>
+                <div class="form-group"><label for="price">Ціна (USD)</label><input type="number" id="price" min="0" step="0.01" required></div>
+                <div class="form-group"><label for="imageUrl">URL зображення</label><input type="url" id="imageUrl" placeholder="https://.../image.png" required></div>
+                <div class="form-group"><label for="changeType">Тип зміни</label><select id="changeType"><option value="none">Без змін</option><option value="up">Ріст (Up)</option><option value="down">Падіння (Down)</option></select></div>
+                <div class="form-group"><label for="changeValue">Значення зміни</label><input type="text" id="changeValue" placeholder="напр. 2.5%"></div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Додати вкладення</button>
+            </form>
             <div style="flex-grow: 1;"></div>
-            <div class="sidebar-footer">
-                <button class="footer-btn" id="logout-button">Вийти</button>
-            </div>
+            <button id="logout-button" class="btn">Вийти</button>
         </aside>
-
-        <header class="page-header"><h1>Керування вкладеннями</h1></header>
-
+        
         <main class="main-content">
-            <div class="content-card">
-                <h3>Додати нове вкладення</h3>
-                <form id="add-investment-form">
-                    <div class="form-group"><label for="title">Назва</label><input type="text" id="title" required></div>
-                    <div class="form-group"><label for="description">Опис</label><textarea id="description" rows="3" required></textarea></div>
-                    <div class="form-group"><label for="price">Ціна (USD)</label><input type="number" id="price" min="0" step="0.01" required></div>
-                    <div class="form-group"><label for="imageUrl">URL зображення</label><input type="url" id="imageUrl" placeholder="https://.../image.png" required></div>
-                    <div class="form-group"><label for="changeType">Тип зміни</label><select id="changeType"><option value="none">Без змін</option><option value="up">Ріст (Up)</option><option value="down">Падіння (Down)</option></select></div>
-                    <div class="form-group"><label for="changeValue">Значення зміни</label><input type="text" id="changeValue" placeholder="напр. 2.5%"></div>
-                    <button type="submit" class="btn btn-primary">Додати вкладення</button>
-                </form>
-            </div>
-            <div class="content-card">
-                <h3>Існуючі вкладення</h3>
-                <div id="investment-list">
-                    <p>Завантаження...</p>
-                </div>
+            <div class="header"><h1>Керування вкладеннями</h1></div>
+            <div class="content-area">
+                <div id="investment-list-container"><p>Завантаження...</p></div>
             </div>
         </main>
+    </div>
+
+    <div id="user-list-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Покупці</h3>
+                <button id="modal-close-btn" class="btn">×</button>
+            </div>
+            <div id="modal-user-list"></div>
+        </div>
     </div>
 
     <script>
@@ -108,24 +115,19 @@
         const loginSection = document.getElementById('login-section');
         const adminPanel = document.getElementById('admin-panel');
         const loginForm = document.getElementById('login-form');
-        const loginError = document.getElementById('login-error');
         const logoutButton = document.getElementById('logout-button');
         const addInvestmentForm = document.getElementById('add-investment-form');
-        const investmentListContainer = document.getElementById('investment-list');
-        
-        // --- AUTH LOGIC ---
+        const investmentListContainer = document.getElementById('investment-list-container');
+        const userListModal = document.getElementById('user-list-modal');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+
+        let allUsersData = {};
+
         const handleLogin = (e) => {
             e.preventDefault();
-            const password = document.getElementById('password').value;
-            // Спрощена перевірка паролю на клієнті для доступу до API.
-            // Основна перевірка - всередині функцій.
-            if (password) { // Тут можна додати перевірку на співпадіння з тим, що в ENV
-                sessionStorage.setItem('isAdmin', 'true');
-                showAdminPanel();
-                loadInvestments();
-            } else {
-                loginError.textContent = "Будь ласка, введіть пароль";
-            }
+            sessionStorage.setItem('isAdmin', 'true');
+            showAdminPanel();
+            loadAdminData();
         };
 
         const handleLogout = () => {
@@ -139,39 +141,44 @@
             adminPanel.classList.remove('hidden');
         };
 
-        // --- API LOGIC ---
         const renderInvestments = (investments) => {
             investmentListContainer.innerHTML = '';
             if (!investments || investments.length === 0) {
-                investmentListContainer.innerHTML = '<p>Ще немає жодного вкладення.</p>';
+                investmentListContainer.innerHTML = '<p>Ще немає жодного вкладення. Додайте перше!</p>';
                 return;
             }
             investments.forEach(inv => {
                 const item = document.createElement('div');
-                item.className = 'investment-list-item';
+                item.className = 'investment-item';
+                item.dataset.id = inv.id;
+                item.dataset.title = inv.title;
                 item.innerHTML = `
                     <img src="${inv.imageUrl}" alt="${inv.title}">
-                    <div class="investment-info">
+                    <div class="info">
                         <strong>${inv.title}</strong>
                         <span>Ціна: ${inv.price} USD</span>
                     </div>
-                    <button class="btn btn-danger" data-id="${inv.id}">Видалити</button>
+                    <div class="stats">
+                        <strong>${inv.purchaseCount}</strong>
+                        <span>покупок</span>
+                    </div>
                 `;
                 investmentListContainer.appendChild(item);
             });
         };
 
-        const loadInvestments = async () => {
+        const loadAdminData = async () => {
             try {
-                const response = await fetch('/.netlify/functions/get-investments');
-                if (!response.ok) throw new Error('Не вдалося завантажити дані.');
+                const response = await fetch('/.netlify/functions/get-admin-dashboard-data');
                 const data = await response.json();
-                renderInvestments(data);
+                if (!response.ok) throw new Error('Не вдалося завантажити дані для адмін-панелі.');
+                allUsersData = data.users;
+                renderInvestments(data.investments);
             } catch (error) {
                 investmentListContainer.innerHTML = `<p style="color:var(--danger-color)">${error.message}</p>`;
             }
         };
-
+        
         const handleAddInvestment = async (e) => {
             e.preventDefault();
             const formData = {
@@ -192,39 +199,52 @@
                 });
                 if (!response.ok) throw new Error('Помилка сервера при створенні.');
                 addInvestmentForm.reset();
-                loadInvestments(); // Оновити список
+                loadAdminData();
             } catch (error) {
                 alert(error.message);
             }
         };
 
-        const handleDeleteInvestment = async (e) => {
-            if (!e.target.matches('.btn-danger')) return;
-            if (!confirm('Ви впевнені, що хочете видалити це вкладення?')) return;
+        const openUserModal = (investmentId, investmentTitle) => {
+            const buyers = Object.values(allUsersData)
+                .filter(userData => userData.purchases && userData.purchases.includes(investmentId));
             
-            const id = e.target.dataset.id;
-            try {
-                const response = await fetch('/.netlify/functions/delete-investment', {
-                    method: 'POST',
-                    body: JSON.stringify({ id })
+            userListModal.querySelector('#modal-title').textContent = `Покупці "${investmentTitle}"`;
+            const userListEl = userListModal.querySelector('#modal-user-list');
+            userListEl.innerHTML = '';
+
+            if (buyers.length > 0) {
+                buyers.forEach(b => {
+                    const p = document.createElement('p');
+                    p.textContent = `${b.full_name} (${b.email})`;
+                    userListEl.appendChild(p);
                 });
-                if (!response.ok) throw new Error('Помилка сервера при видаленні.');
-                loadInvestments(); // Оновити список
-            } catch (error) {
-                alert(error.message);
+            } else {
+                userListEl.innerHTML = '<p>Покупок ще немає.</p>';
             }
+            userListModal.classList.remove('hidden');
+            userListModal.classList.add('visible');
         };
 
-        // --- EVENT LISTENERS ---
         loginForm.addEventListener('submit', handleLogin);
         logoutButton.addEventListener('click', handleLogout);
         addInvestmentForm.addEventListener('submit', handleAddInvestment);
-        investmentListContainer.addEventListener('click', handleDeleteInvestment);
+        
+        investmentListContainer.addEventListener('click', (e) => {
+            const item = e.target.closest('.investment-item');
+            if (item) {
+                openUserModal(item.dataset.id, item.dataset.title);
+            }
+        });
+        
+        modalCloseBtn.addEventListener('click', () => {
+            userListModal.classList.remove('visible');
+            userListModal.classList.add('hidden');
+        });
 
-        // --- INITIAL CHECK ---
         if (sessionStorage.getItem('isAdmin') === 'true') {
             showAdminPanel();
-            loadInvestments();
+            loadAdminData();
         }
     });
     </script>
