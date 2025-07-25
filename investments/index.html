@@ -17,7 +17,7 @@
             if (theme === 'light') document.documentElement.classList.add('light-theme');
         })();
     </script>
-    <style>
+        <style>
         :root {
             --primary-color: #9333ea; --primary-glow: rgba(147, 51, 234, 0.4); --success-color: #22c55e; --danger-color: #ef4444; --bg-main: #020617; --bg-sidebar: rgba(12, 19, 34, 0.85); --bg-header: rgba(2, 6, 23, 0.7); --bg-card: rgba(15, 23, 42, 0.6); --text-primary: #f8fafc; --text-secondary: #94a3b8; --border-color: rgba(51, 65, 85, 0.5); --shadow-color: rgba(0, 0, 0, 0.2); --sidebar-width-expanded: 260px; --bg-overlay: rgba(0, 0, 0, 0.7); --bg-input: rgba(15, 23, 42, 0.5);
         }
@@ -48,7 +48,12 @@
         .search-wrapper svg { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary); }
         #search-input { width: 100%; padding: 0.8rem 1rem 0.8rem 3rem; background-color: var(--bg-input); border: 1px solid var(--border-color); border-radius: 999px; color: var(--text-primary); font-size: 1rem; }
         
-        .investments-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; align-content: start; }
+        .investments-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 1.5rem; 
+            /* ВИДАЛЕНО: align-content: start; */
+        }
         .investment-card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer; }
         .investment-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px var(--shadow-color); }
         .investment-card .card-image { width: 100%; height: 160px; object-fit: cover; }
