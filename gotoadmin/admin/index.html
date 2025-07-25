@@ -51,7 +51,7 @@
         #search-input { width: 100%; padding: 0.8rem 1rem 0.8rem 3rem; background-color: var(--bg-input); border: 1px solid var(--border-color); border-radius: 999px; color: var(--text-primary); font-size: 1rem; }
         
         .investment-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; align-content: start; }
-        .investment-card { background-color: var(--bg-card); border-radius: 12px; padding: 1rem; cursor: pointer; display: flex; flex-direction: column; }
+        .investment-card { background-color: var(--bg-card); border-radius: 12px; padding: 1rem; display: flex; flex-direction: column; }
         .investment-card-header { display: flex; gap: 1rem; align-items: flex-start; }
         .investment-card img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
         .investment-card .info { flex-grow: 1; }
@@ -76,6 +76,14 @@
         
         #toast-notification { position: fixed; bottom: 1.5rem; right: 1.5rem; background-color: var(--success-color); color: white; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 9999; transform: translateY(200%); opacity: 0; transition: transform 0.4s ease, opacity 0.4s ease; }
         #toast-notification.show { transform: translateY(0); opacity: 1; }
+        
+        @media (max-width: 768px) {
+            .page-container { grid-template-columns: 1fr; }
+            .sidebar { position: fixed; transform: translateX(-100%); transition: transform 0.3s ease; z-index: 1300; height: 100%; }
+            body.sidebar-open .sidebar { transform: translateX(0); }
+            .header { padding: 0 1.5rem; }
+            .main-content { padding: 1.5rem; }
+        }
     </style>
 </head>
 <body>
@@ -178,7 +186,7 @@
         // --- AUTH & UI ---
         const handleLogin = (e) => { e.preventDefault(); sessionStorage.setItem('isAdmin', 'true'); showAdminPanel(); loadAdminData(); };
         const handleLogout = () => { sessionStorage.removeItem('isAdmin'); loginSection.classList.remove('hidden'); adminPanel.classList.add('hidden'); };
-        const showAdminPanel = () => { loginSection.classList.add('hidden'); adminPanel.classList.remove('hidden'); };
+        const showAdminPanel = () => { loginSection.classList.remove('hidden'); adminPanel.classList.remove('hidden'); };
         const handleThemeToggle = () => { const isLight = document.documentElement.classList.toggle('light-theme'); localStorage.setItem('theme', isLight ? 'light' : 'dark'); };
 
         const showToast = (message) => {
@@ -193,7 +201,7 @@
         // --- DATA RENDERING & SEARCH ---
         const renderInvestments = (investmentsToRender) => {
             investmentGrid.innerHTML = '';
-            if (investmentsToRender.length === 0) {
+            if (!investmentsToRender || investmentsToRender.length === 0) {
                 investmentGrid.innerHTML = '<p>Нічого не знайдено.</p>';
                 return;
             }
@@ -240,15 +248,72 @@
         };
 
         // --- MODALS ---
-        const openEditModal = (investment) => { /* ... код без змін ... */ };
-        const openBuyersModal = (investmentId) => { /* ... код без змін ... */ };
+        const openEditModal = (investment) => {
+            editModal.classList.add('visible');
+            if (investment) {
+                editModal.querySelector('#edit-modal-title').textContent = 'Редагувати вкладення';
+                editModal.querySelector('#edit-id').value = investment.id;
+                editModal.querySelector('#edit-title').value = investment.title;
+                editModal.querySelector('#edit-description').value = investment.description;
+                editModal.querySelector('#edit-price').value = investment.price;
+                editModal.querySelector('#edit-imageUrl').value = investment.imageUrl;
+                editModal.querySelector('#edit-changeType').value = investment.change?.type || 'none';
+                editModal.querySelector('#edit-changeValue').value = investment.change?.value || '';
+            } else {
+                editModal.querySelector('#edit-modal-title').textContent = 'Створити вкладення';
+                editForm.reset();
+                editModal.querySelector('#edit-id').value = '';
+            }
+        };
+
+        const openBuyersModal = (investmentId) => {
+            const investment = allInvestments.find(inv => inv.id === investmentId);
+            const buyersListEl = buyersModal.querySelector('#buyers-list');
+            buyersListEl.innerHTML = '';
+            buyersModal.querySelector('#buyers-modal-title').textContent = `Покупці "${investment.title}"`;
+
+            const buyers = Object.entries(allUsers)
+                .filter(([userId, userData]) => userData.purchases && userData.purchases.some(p => p.investmentId === investmentId));
+
+            if (buyers.length === 0) {
+                buyersListEl.innerHTML = '<p>Покупок ще немає.</p>';
+            } else {
+                buyers.forEach(([userId, userData]) => {
+                    const purchases = userData.purchases.filter(p => p.investmentId === investmentId);
+                    purchases.forEach(p => {
+                        const item = document.createElement('div');
+                        item.style.marginBottom = '1rem';
+                        item.innerHTML = `
+                            <strong>${userData.full_name}</strong> (${userData.email})<br>
+                            <small>ID: ${userId}</small><br>
+                            <small>Куплено: ${new Date(p.purchaseTimestamp).toLocaleString()}</small><br>
+                            <small>Баланс на момент покупки: ${p.balanceAtPurchase.toFixed(2)} USD</small><br>
+                            <small>Поточний баланс: ${userData.balance.toFixed(2)} USD</small>
+                        `;
+                        buyersListEl.appendChild(item);
+                    });
+                });
+            }
+            buyersModal.classList.add('visible');
+        };
+
         const closeModal = (modal) => modal.classList.remove('visible');
 
         // --- API CALLS ---
         const handleEditFormSubmit = async (e) => {
             e.preventDefault();
             const id = editModal.querySelector('#edit-id').value;
-            const data = { title: editModal.querySelector('#edit-title').value, description: editModal.querySelector('#edit-description').value, price: parseFloat(editModal.querySelector('#edit-price').value), imageUrl: editModal.querySelector('#edit-imageUrl').value, change: { type: editModal.querySelector('#edit-changeType').value, value: editModal.querySelector('#edit-changeValue').value } };
+            const data = {
+                title: editModal.querySelector('#edit-title').value,
+                description: editModal.querySelector('#edit-description').value,
+                price: parseFloat(editModal.querySelector('#edit-price').value),
+                imageUrl: editModal.querySelector('#edit-imageUrl').value,
+                change: {
+                    type: editModal.querySelector('#edit-changeType').value,
+                    value: editModal.querySelector('#edit-changeValue').value
+                }
+            };
+            
             const endpoint = id ? '/.netlify/functions/update-investment' : '/.netlify/functions/create-investment';
             if (id) data.id = id;
 
@@ -262,7 +327,17 @@
                 alert(error.message);
             }
         };
-        const handleArchiveInvestment = async (id) => { /* ... код без змін ... */ };
+
+        const handleArchiveInvestment = async (id) => {
+            if (!confirm('Ви впевнені, що хочете перемістити це вкладення в кошик?')) return;
+            try {
+                const response = await fetch('/.netlify/functions/archive-investment', { method: 'POST', body: JSON.stringify({ id }) });
+                if (!response.ok) throw new Error('Не вдалося перемістити в кошик.');
+                loadAdminData();
+            } catch (error) {
+                alert(error.message);
+            }
+        };
 
         // --- EVENT LISTENERS ---
         loginForm.addEventListener('submit', handleLogin);
@@ -271,6 +346,7 @@
         addNewBtn.addEventListener('click', () => openEditModal(null));
         editForm.addEventListener('submit', handleEditFormSubmit);
         searchInput.addEventListener('input', handleSearch);
+
         investmentGrid.addEventListener('click', (e) => {
             const button = e.target.closest('button');
             if (!button) return;
@@ -288,7 +364,10 @@
         editModal.querySelector('.modal-close-btn').addEventListener('click', () => closeModal(editModal));
         buyersModal.querySelector('.modal-close-btn').addEventListener('click', () => closeModal(buyersModal));
 
-        if (sessionStorage.getItem('isAdmin') === 'true') { showAdminPanel(); loadAdminData(); }
+        if (sessionStorage.getItem('isAdmin') === 'true') {
+            showAdminPanel();
+            loadAdminData();
+        }
     });
     </script>
 </body>
