@@ -6,8 +6,7 @@
     <title>Вкладення - SCR</title>
     <link rel="icon" href="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239333ea' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z'/%3e%3c/svg%3e">
     <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-    <script src="https://www.paypal.com/sdk/js?client-id=ASJIOL6y24xuwQiCC-a8RBkVypAp5VuYLf7cXEIzc4aLV5yYEXDVvellq-OGQQfZjkqJBZh1h0JqS9mU&currency=USD"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://www.paypal.com/sdk/js?client-id=ASJIOL6y24xuwQiCC-a8RBkVypAp5VuYLf7cXEIzc4aLV5yYEXDVvellq-OGQQfZjkqJBZh1h0JqS9mU&currency=USD"></script>    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -30,10 +29,13 @@
         .page-container { display: grid; grid-template-columns: var(--sidebar-width-expanded) 1fr; min-height: 100vh; }
         .sidebar { background-color: var(--bg-sidebar); backdrop-filter: blur(10px); border-right: 1px solid var(--border-color); padding: 1.5rem; display: flex; flex-direction: column; position: fixed; left: 0; top: 0; height: 100%; width: var(--sidebar-width-expanded); z-index: 1100; }
         .sidebar-header { display: flex; align-items: center; margin-bottom: 2.5rem; color: var(--text-primary); text-decoration: none; }
+        .logo-icon { width: 30px; height: 30px; flex-shrink: 0; }
+        .logo-text { font-size: 1.5rem; font-weight: 700; margin-left: 1rem; }
         .nav-menu { list-style: none; padding: 0; margin: 0; flex-grow: 1; }
         .nav-item a { display: flex; align-items: center; padding: .8rem 1rem; color: var(--text-secondary); text-decoration: none; border-radius: 8px; margin-bottom: .5rem; font-weight: 500; }
         .nav-item.active a { background: linear-gradient(90deg, var(--primary-color), #8b5cf6); color: white; font-weight: 600; box-shadow: 0 4px 15px -3px var(--primary-glow); }
         .nav-icon { width: 24px; height: 24px; margin-right: 1.25rem; }
+        .nav-text { white-space: nowrap; }
         .sidebar-footer { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border-color); }
         .footer-btn { background: none; border: none; width: 100%; display: flex; align-items: center; padding: .8rem 1rem; color: var(--text-secondary); font-size: 1rem; font-weight: 500; cursor: pointer; border-radius: 8px; }
         
@@ -64,28 +66,38 @@
         #modal-title { margin: 0; font-size: 1.5rem; }
         .modal-close-btn { background: 0 0; border: none; color: var(--text-secondary); font-size: 1.5rem; cursor: pointer; }
         #balance-info { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem; }
-        #amount-input { width: 100%; padding: 0.875rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; font-size: 1.2rem; background-color: var(--bg-main); color: var(--text-primary); margin-bottom: 1rem;}
-        #modal-status { text-align: center; margin-top: 1rem; font-weight: 500; }
+        #confirm-purchase-btn { width: 100%; }
+        #modal-status { text-align: center; margin-top: 1rem; font-weight: 500; min-height: 20px;}
         .hidden { display: none; }
     </style>
 </head>
 <body>
     <div class="page-container">
         <aside class="sidebar">
-            <!-- Навігація тут, як і в інших файлах -->
+            <a href="/wallet/" class="sidebar-header">
+                <svg class="logo-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path></svg>
+                <span class="logo-text">SCR</span>
+            </a>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="/wallet/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg></span><span class="nav-text">Гаманець</span></a></li>
+                <li class="nav-item"><a href="/transactions/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></span><span class="nav-text">Транзакції</span></a></li>
+                <li class="nav-item active"><a href="/investments/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg></span><span class="nav-text">Вкладення</span></a></li>
+                <li class="nav-item"><a href="/settings/"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></span><span class="nav-text">Налаштування</span></a></li>
+            </ul>
+            <div class="sidebar-footer">
+                 <button class="footer-btn" id="logout-button" title="Вийти з акаунту"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></span><span class="nav-text">Вийти</span></button>
+            </div>
         </aside>
 
         <header class="page-header"><h1>Вкладення</h1></header>
 
         <main class="main-content">
             <div id="investments-grid" class="investments-grid">
-                <!-- Картки будуть вставлені сюди динамічно -->
                 <p>Завантаження вкладень...</p>
             </div>
         </main>
     </div>
 
-    <!-- Модальне вікно покупки -->
     <div id="purchase-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -93,13 +105,12 @@
                 <button class="modal-close-btn">×</button>
             </div>
             <div id="step-1">
-                <p id="balance-info">Ваш баланс: ... SCR</p>
-                <p>Введіть суму, яку бажаєте вкласти:</p>
-                <input type="number" id="amount-input" min="1" placeholder="Сума в USD">
+                <p id="balance-info">Ваш баланс: ... USD</p>
+                <p>Ціна вкладення фіксована. Натисніть "Підтвердити", щоб купити.</p>
                 <button id="confirm-purchase-btn" class="btn btn-primary" style="width: 100%;">Підтвердити</button>
             </div>
             <div id="step-2" class="hidden">
-                <p>Для завершення операції, будь ласка, оплатіть через PayPal.</p>
+                <p id="paypal-info"></p>
                 <div id="paypal-button-container"></div>
             </div>
             <p id="modal-status"></p>
@@ -115,7 +126,8 @@
         const modal = document.getElementById('purchase-modal');
         const modalCloseBtn = modal.querySelector('.modal-close-btn');
         const confirmPurchaseBtn = document.getElementById('confirm-purchase-btn');
-        const amountInput = document.getElementById('amount-input');
+        const logoutButton = document.querySelector('#logout-button');
+
         let currentInvestment = null;
         let userBalance = 0;
 
@@ -152,19 +164,19 @@
         };
 
         const loadData = async () => {
+            grid.innerHTML = '<p>Завантаження...</p>';
             try {
                 const token = user.token.access_token;
                 const response = await fetch('/.netlify/functions/get-investments-for-user', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                if (!response.ok) throw new Error('Не вдалося завантажити дані.');
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.error || 'Не вдалося завантажити дані.');
+                }
                 const data = await response.json();
                 renderCards(data.investments, data.userPurchaseIds);
-                
-                // Оновлюємо баланс з Netlify Identity
-                await user.jwt(true); // Оновити токен і метадані
-                const updatedUser = netlifyIdentity.currentUser();
-                userBalance = updatedUser.user_metadata?.balance || 0;
+                userBalance = data.balance;
             } catch (error) {
                 grid.innerHTML = `<p style="color:var(--danger-color);">${error.message}</p>`;
             }
@@ -174,74 +186,73 @@
             currentInvestment = inv;
             document.getElementById('modal-title').textContent = `Вкладення в "${inv.title}"`;
             document.getElementById('balance-info').textContent = `Ваш баланс: ${userBalance.toFixed(2)} USD`;
-            amountInput.value = inv.price; // За замовчуванням ставимо ціну
+            document.getElementById('modal-status').textContent = '';
+            document.getElementById('step-1').classList.remove('hidden');
+            document.getElementById('step-2').classList.add('hidden');
             modal.classList.add('visible');
         };
 
         const closeModal = () => {
             modal.classList.remove('visible');
-            document.getElementById('step-1').classList.remove('hidden');
-            document.getElementById('step-2').classList.add('hidden');
-            document.getElementById('modal-status').textContent = '';
-            document.getElementById('paypal-button-container').innerHTML = '';
             currentInvestment = null;
         };
         
         const handlePurchase = async () => {
-            const amount = parseFloat(amountInput.value);
-            if (isNaN(amount) || amount <= 0) {
-                document.getElementById('modal-status').textContent = 'Введіть коректну суму.';
-                return;
-            }
+            const price = currentInvestment.price;
+            const statusEl = document.getElementById('modal-status');
+            statusEl.textContent = 'Обробка...';
+            confirmPurchaseBtn.disabled = true;
 
-            if (userBalance >= amount) {
-                // Списуємо з балансу
-                document.getElementById('modal-status').textContent = 'Обробка...';
-                try {
-                    const token = user.token.access_token;
-                    const response = await fetch('/.netlify/functions/purchase-investment', {
-                        method: 'POST',
-                        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ investmentId: currentInvestment.id, price: amount })
-                    });
-                    const result = await response.json();
-                    if (!response.ok) throw new Error(result.error);
-                    
-                    document.getElementById('modal-status').textContent = 'Успішно куплено!';
-                    await loadData(); // Оновити сторінку
-                    setTimeout(closeModal, 1500);
-
-                } catch (error) {
-                    document.getElementById('modal-status').textContent = `Помилка: ${error.message}`;
+            try {
+                if (userBalance < price) {
+                    const shortfall = price - userBalance;
+                    document.getElementById('step-1').classList.add('hidden');
+                    document.getElementById('step-2').classList.remove('hidden');
+                    document.getElementById('paypal-info').textContent = `Для покупки не вистачає ${shortfall.toFixed(2)} USD. Будь ласка, поповніть баланс.`;
+                    renderPayPalButtons(shortfall);
+                    return;
                 }
-            } else {
-                // Не вистачає грошей, ініціюємо PayPal
-                const shortfall = amount - userBalance;
-                document.getElementById('step-1').classList.add('hidden');
-                document.getElementById('step-2').classList.remove('hidden');
-                renderPayPalButtons(shortfall);
+
+                const token = user.token.access_token;
+                const response = await fetch('/.netlify/functions/purchase-investment', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ investmentId: currentInvestment.id, price: price })
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error);
+                
+                statusEl.textContent = 'Успішно куплено!';
+                await loadData();
+                setTimeout(closeModal, 1500);
+
+            } catch (error) {
+                statusEl.textContent = `Помилка: ${error.message}`;
+            } finally {
+                confirmPurchaseBtn.disabled = false;
             }
         };
         
         const renderPayPalButtons = (amount) => {
+            const container = document.getElementById('paypal-button-container');
+            container.innerHTML = '';
             paypal.Buttons({
                 createOrder: (data, actions) => actions.order.create({
-                    purchase_units: [{ amount: { value: amount.toFixed(2) } }]
+                    purchase_units: [{ amount: { value: amount.toFixed(2), currency_code: 'USD' } }]
                 }),
                 onApprove: async (data, actions) => {
                     document.getElementById('modal-status').textContent = 'Платіж успішний, оновлюємо баланс...';
-                    // Викликаємо ту саму функцію, що і на сторінці гаманця
-                    const response = await fetch('/.netlify/functions/update-balance', {
+                    await fetch('/.netlify/functions/update-balance', {
                         method: 'POST',
-                        headers: { 'Authorization': `Bearer ${user.token.access_token}` },
+                        headers: { 'Authorization': `Bearer ${user.token.access_token}`, 'Content-Type': 'application/json' },
                         body: JSON.stringify({ orderID: data.orderID })
                     });
-                    // Тут треба додати логіку оновлення балансу в Netlify і потім повторної спроби покупки
-                    alert('Баланс поповнено! Тепер спробуйте купити ще раз.');
+                    
+                    alert('Баланс поповнено! Тепер ви можете завершити покупку.');
                     await loadData();
                     closeModal();
                 }
-            }).render('#paypal-button-container');
+            }).render(container);
         };
 
         grid.addEventListener('click', (e) => {
@@ -256,8 +267,9 @@
 
         modalCloseBtn.addEventListener('click', closeModal);
         confirmPurchaseBtn.addEventListener('click', handlePurchase);
+        logoutButton.addEventListener('click', () => { netlifyIdentity.logout(); });
+        netlifyIdentity.on('logout', () => { window.location.replace('/'); });
         
-        // --- ЗАПУСК ---
         loadData();
     });
     </script>
