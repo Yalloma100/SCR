@@ -98,6 +98,7 @@
         </div>
     </div>
 
+    <!-- ВИПРАВЛЕНО: Додано клас hidden за замовчуванням -->
     <div id="admin-panel" class="page-container hidden">
         <aside class="sidebar">
             <div class="sidebar-header">
@@ -134,7 +135,7 @@
         </main>
     </div>
     
-    <div id="edit-modal" class="modal-overlay">
+    <div id="edit-modal" class="modal-overlay hidden">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 id="edit-modal-title"></h3>
@@ -153,7 +154,7 @@
         </div>
     </div>
     
-    <div id="buyers-modal" class="modal-overlay">
+    <div id="buyers-modal" class="modal-overlay hidden">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 id="buyers-modal-title"></h3>
@@ -184,10 +185,30 @@
         let allUsers = {};
         
         // --- AUTH & UI ---
-        const handleLogin = (e) => { e.preventDefault(); sessionStorage.setItem('isAdmin', 'true'); showAdminPanel(); loadAdminData(); };
-        const handleLogout = () => { sessionStorage.removeItem('isAdmin'); loginSection.classList.remove('hidden'); adminPanel.classList.add('hidden'); };
-        const showAdminPanel = () => { loginSection.classList.remove('hidden'); adminPanel.classList.remove('hidden'); };
-        const handleThemeToggle = () => { const isLight = document.documentElement.classList.toggle('light-theme'); localStorage.setItem('theme', isLight ? 'light' : 'dark'); };
+        const handleLogin = (e) => {
+            e.preventDefault();
+            // Тут може бути реальна перевірка пароля через fetch до серверної функції,
+            // але для простоти використовуємо sessionStorage як ключ доступу
+            sessionStorage.setItem('isAdmin', 'true');
+            showAdminPanel();
+            loadAdminData();
+        };
+        const handleLogout = () => {
+            sessionStorage.removeItem('isAdmin');
+            showLogin();
+        };
+        const showAdminPanel = () => {
+            loginSection.classList.add('hidden');
+            adminPanel.classList.remove('hidden');
+        };
+        const showLogin = () => {
+            loginSection.classList.remove('hidden');
+            adminPanel.classList.add('hidden');
+        };
+        const handleThemeToggle = () => {
+            const isLight = document.documentElement.classList.toggle('light-theme');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        };
 
         const showToast = (message) => {
             const toast = document.getElementById('toast-notification');
@@ -283,6 +304,8 @@
                     purchases.forEach(p => {
                         const item = document.createElement('div');
                         item.style.marginBottom = '1rem';
+                        item.style.borderBottom = '1px solid var(--border-color)';
+                        item.style.paddingBottom = '1rem';
                         item.innerHTML = `
                             <strong>${userData.full_name}</strong> (${userData.email})<br>
                             <small>ID: ${userId}</small><br>
@@ -364,9 +387,12 @@
         editModal.querySelector('.modal-close-btn').addEventListener('click', () => closeModal(editModal));
         buyersModal.querySelector('.modal-close-btn').addEventListener('click', () => closeModal(buyersModal));
 
+        // --- INITIAL CHECK ---
         if (sessionStorage.getItem('isAdmin') === 'true') {
             showAdminPanel();
             loadAdminData();
+        } else {
+            showLogin();
         }
     });
     </script>
