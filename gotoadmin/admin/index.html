@@ -28,6 +28,7 @@
         .login-wrapper { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; }
         .login-card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem 2.5rem; max-width: 400px; width: 100%; box-shadow: 0 8px 32px var(--shadow-color); backdrop-filter: blur(12px); }
         .login-card h1 { text-align: center; margin-bottom: 2rem; }
+        #login-error { color: var(--danger-color); text-align: center; margin-top: 1rem; min-height: 20px; }
         
         .page-container { display: grid; grid-template-columns: var(--sidebar-width) 1fr; grid-template-rows: var(--header-height) 1fr; min-height: 100vh; transition: grid-template-columns 0.3s ease; }
         .sidebar { grid-row: 1 / 3; background-color: var(--bg-sidebar); backdrop-filter: blur(10px); padding: 1.5rem; display: flex; flex-direction: column; border-right: 1px solid var(--border-color); }
@@ -65,6 +66,7 @@
         .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--primary-glow); }
         
         .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.6rem 1rem; font-size: 0.9rem; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; transition: all 0.2s; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
         .btn-primary { background: var(--primary-color); color: white; }
         .btn-secondary { background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border-color); }
         .btn-danger { background: var(--danger-color); color: white; }
@@ -93,12 +95,12 @@
             <form id="login-form">
                 <div class="form-group"><label for="username">Логін</label><input type="text" id="username" required></div>
                 <div class="form-group"><label for="password">Пароль</label><input type="password" id="password" required></div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Увійти</button>
+                <button type="submit" class="btn btn-primary" id="login-btn" style="width: 100%;">Увійти</button>
+                <p id="login-error"></p>
             </form>
         </div>
     </div>
 
-    <!-- ВИПРАВЛЕНО: Додано клас hidden за замовчуванням -->
     <div id="admin-panel" class="page-container hidden">
         <aside class="sidebar">
             <div class="sidebar-header">
@@ -129,9 +131,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>
                 <input type="text" id="search-input" placeholder="Пошук за назвою...">
             </div>
-            <div id="investment-grid" class="investment-grid">
-                <p>Завантаження...</p>
-            </div>
+            <div id="investment-grid" class="investment-grid"></div>
         </main>
     </div>
     
@@ -171,6 +171,8 @@
         const loginSection = document.getElementById('login-section');
         const adminPanel = document.getElementById('admin-panel');
         const loginForm = document.getElementById('login-form');
+        const loginBtn = document.getElementById('login-btn');
+        const loginError = document.getElementById('login-error');
         const logoutButton = document.getElementById('logout-button');
         const themeToggleBtn = document.getElementById('theme-toggle-btn');
         const addNewBtn = document.getElementById('add-new-btn');
@@ -185,38 +187,42 @@
         let allUsers = {};
         
         // --- AUTH & UI ---
-        const handleLogin = (e) => {
+        const handleLogin = async (e) => {
             e.preventDefault();
-            // Тут може бути реальна перевірка пароля через fetch до серверної функції,
-            // але для простоти використовуємо sessionStorage як ключ доступу
-            sessionStorage.setItem('isAdmin', 'true');
-            showAdminPanel();
-            loadAdminData();
+            loginBtn.disabled = true;
+            loginError.textContent = '';
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/.netlify/functions/admin-auth', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, password })
+                });
+                const result = await response.json();
+                if (!response.ok || !result.success) {
+                    throw new Error(result.message || 'Помилка авторизації');
+                }
+                sessionStorage.setItem('isAdmin', 'true');
+                showAdminPanel();
+                loadAdminData();
+            } catch (error) {
+                loginError.textContent = error.message;
+            } finally {
+                loginBtn.disabled = false;
+            }
         };
-        const handleLogout = () => {
-            sessionStorage.removeItem('isAdmin');
-            showLogin();
-        };
-        const showAdminPanel = () => {
-            loginSection.classList.add('hidden');
-            adminPanel.classList.remove('hidden');
-        };
-        const showLogin = () => {
-            loginSection.classList.remove('hidden');
-            adminPanel.classList.add('hidden');
-        };
-        const handleThemeToggle = () => {
-            const isLight = document.documentElement.classList.toggle('light-theme');
-            localStorage.setItem('theme', isLight ? 'light' : 'dark');
-        };
+        
+        const handleLogout = () => { sessionStorage.removeItem('isAdmin'); showLogin(); };
+        const showAdminPanel = () => { loginSection.classList.add('hidden'); adminPanel.classList.remove('hidden'); };
+        const showLogin = () => { loginSection.classList.remove('hidden'); adminPanel.classList.add('hidden'); };
+        const handleThemeToggle = () => { const isLight = document.documentElement.classList.toggle('light-theme'); localStorage.setItem('theme', isLight ? 'light' : 'dark'); };
 
         const showToast = (message) => {
             const toast = document.getElementById('toast-notification');
             toast.textContent = message;
             toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
         };
 
         // --- DATA RENDERING & SEARCH ---
@@ -292,9 +298,7 @@
             const buyersListEl = buyersModal.querySelector('#buyers-list');
             buyersListEl.innerHTML = '';
             buyersModal.querySelector('#buyers-modal-title').textContent = `Покупці "${investment.title}"`;
-
-            const buyers = Object.entries(allUsers)
-                .filter(([userId, userData]) => userData.purchases && userData.purchases.some(p => p.investmentId === investmentId));
+            const buyers = Object.entries(allUsers).filter(([userId, userData]) => userData.purchases && userData.purchases.some(p => p.investmentId === investmentId));
 
             if (buyers.length === 0) {
                 buyersListEl.innerHTML = '<p>Покупок ще немає.</p>';
@@ -303,16 +307,8 @@
                     const purchases = userData.purchases.filter(p => p.investmentId === investmentId);
                     purchases.forEach(p => {
                         const item = document.createElement('div');
-                        item.style.marginBottom = '1rem';
-                        item.style.borderBottom = '1px solid var(--border-color)';
-                        item.style.paddingBottom = '1rem';
-                        item.innerHTML = `
-                            <strong>${userData.full_name}</strong> (${userData.email})<br>
-                            <small>ID: ${userId}</small><br>
-                            <small>Куплено: ${new Date(p.purchaseTimestamp).toLocaleString()}</small><br>
-                            <small>Баланс на момент покупки: ${p.balanceAtPurchase.toFixed(2)} USD</small><br>
-                            <small>Поточний баланс: ${userData.balance.toFixed(2)} USD</small>
-                        `;
+                        item.style.marginBottom = '1rem'; item.style.borderBottom = '1px solid var(--border-color)'; item.style.paddingBottom = '1rem';
+                        item.innerHTML = `<strong>${userData.full_name}</strong> (${userData.email})<br><small>ID: ${userId}</small><br><small>Куплено: ${new Date(p.purchaseTimestamp).toLocaleString()}</small><br><small>Баланс на момент покупки: ${p.balanceAtPurchase.toFixed(2)} USD</small><br><small>Поточний баланс: ${userData.balance.toFixed(2)} USD</small>`;
                         buyersListEl.appendChild(item);
                     });
                 });
@@ -326,29 +322,16 @@
         const handleEditFormSubmit = async (e) => {
             e.preventDefault();
             const id = editModal.querySelector('#edit-id').value;
-            const data = {
-                title: editModal.querySelector('#edit-title').value,
-                description: editModal.querySelector('#edit-description').value,
-                price: parseFloat(editModal.querySelector('#edit-price').value),
-                imageUrl: editModal.querySelector('#edit-imageUrl').value,
-                change: {
-                    type: editModal.querySelector('#edit-changeType').value,
-                    value: editModal.querySelector('#edit-changeValue').value
-                }
-            };
-            
+            const data = { title: editModal.querySelector('#edit-title').value, description: editModal.querySelector('#edit-description').value, price: parseFloat(editModal.querySelector('#edit-price').value), imageUrl: editModal.querySelector('#edit-imageUrl').value, change: { type: editModal.querySelector('#edit-changeType').value, value: editModal.querySelector('#edit-changeValue').value } };
             const endpoint = id ? '/.netlify/functions/update-investment' : '/.netlify/functions/create-investment';
             if (id) data.id = id;
-
             try {
                 const response = await fetch(endpoint, { method: 'POST', body: JSON.stringify(data) });
                 if (!response.ok) throw new Error('Не вдалося зберегти зміни.');
                 closeModal(editModal);
                 if (!id) { showToast('Нове вкладення успішно додано!'); }
                 loadAdminData();
-            } catch (error) {
-                alert(error.message);
-            }
+            } catch (error) { alert(error.message); }
         };
 
         const handleArchiveInvestment = async (id) => {
@@ -357,9 +340,7 @@
                 const response = await fetch('/.netlify/functions/archive-investment', { method: 'POST', body: JSON.stringify({ id }) });
                 if (!response.ok) throw new Error('Не вдалося перемістити в кошик.');
                 loadAdminData();
-            } catch (error) {
-                alert(error.message);
-            }
+            } catch (error) { alert(error.message); }
         };
 
         // --- EVENT LISTENERS ---
@@ -376,7 +357,7 @@
             const id = button.dataset.id;
             if (button.classList.contains('edit-btn')) {
                 const investment = allInvestments.find(inv => inv.id === id);
-                openEditModal(investment);
+                if (investment) openEditModal(investment);
             } else if (button.classList.contains('archive-btn')) {
                 handleArchiveInvestment(id);
             } else if (button.classList.contains('view-buyers-btn')) {
