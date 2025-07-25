@@ -19,14 +19,20 @@ exports.handler = async (event, context) => {
         const allInvestments = investmentsResult.data;
         const allUsersData = usersResult.data;
         
-        // Отримуємо покупки конкретного користувача, якщо він існує в нашій БД
-        const userPurchases = allUsersData[userId] ? allUsersData[userId].purchases : [];
+        // Отримуємо дані конкретного користувача, якщо він існує в нашій БД
+        const userData = allUsersData[userId];
 
+        // ВИПРАВЛЕНО: Визначаємо покупки та баланс, навіть якщо користувача ще немає
+        const userPurchases = userData ? userData.purchases || [] : [];
+        const userBalance = userData ? userData.balance || 0 : 0;
+
+        // Повертаємо повний набір даних
         return {
             statusCode: 200,
             body: JSON.stringify({
                 investments: allInvestments,
-                userPurchaseIds: userPurchases // Масив ID куплених вкладень
+                userPurchaseIds: userPurchases,
+                balance: userBalance // Тепер це поле завжди буде присутнім
             }),
         };
     } catch (error) {
