@@ -57,6 +57,7 @@
         .price { font-size: 1.5rem; font-weight: 700; }
         .btn { padding: 0.6rem 1.2rem; font-size: 0.9rem; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; transition: all 0.2s; }
         .btn-primary { background-image: linear-gradient(120deg, var(--primary-color) 0%, #8b5cf6 100%); color: white; }
+        .btn:disabled { opacity: 0.7; cursor: not-allowed; }
         .btn-success { background-color: var(--success-color); color: white; cursor: default; }
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1200; opacity: 0; visibility: hidden; transition: opacity .3s; }
@@ -133,6 +134,10 @@
 
         const renderCards = (investments, userPurchaseIds) => {
             grid.innerHTML = '';
+            if (!investments || investments.length === 0) {
+                grid.innerHTML = '<p>Наразі немає доступних вкладень.</p>';
+                return;
+            }
             investments.forEach(inv => {
                 const isPurchased = userPurchaseIds.includes(inv.id);
                 const card = document.createElement('div');
@@ -142,7 +147,7 @@
                     <div class="card-content">
                         <div class="card-header">
                             <h3>${inv.title}</h3>
-                            ${inv.change.type !== 'none' ? `
+                            ${inv.change && inv.change.type !== 'none' ? `
                             <span class="rate-change ${inv.change.type === 'up' ? 'positive' : 'negative'}">
                                 ${inv.change.value}
                             </span>` : ''}
@@ -185,7 +190,8 @@
         const openModal = (inv) => {
             currentInvestment = inv;
             document.getElementById('modal-title').textContent = `Вкладення в "${inv.title}"`;
-            document.getElementById('balance-info').textContent = `Ваш баланс: ${userBalance.toFixed(2)} USD`;
+            // ВИПРАВЛЕНО: Додано перевірку, щоб уникнути помилки, якщо userBalance ще не завантажено
+            document.getElementById('balance-info').textContent = `Ваш баланс: ${(userBalance || 0).toFixed(2)} USD`;
             document.getElementById('modal-status').textContent = '';
             document.getElementById('step-1').classList.remove('hidden');
             document.getElementById('step-2').classList.add('hidden');
