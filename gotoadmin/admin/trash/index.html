@@ -124,7 +124,7 @@
                 trashListContainer.innerHTML = '<p>Кошик порожній.</p>';
                 return;
             }
-            allTrashItems = items; // Зберігаємо для доступу при редагуванні
+            allTrashItems = items;
             items.forEach(item => {
                 const el = document.createElement('div');
                 el.className = 'trash-item';
@@ -171,13 +171,13 @@
             e.preventDefault();
             const id = editModal.querySelector('#edit-id').value;
             const data = {
+                id: id,
                 title: editModal.querySelector('#edit-title').value,
                 description: editModal.querySelector('#edit-description').value,
                 price: parseFloat(editModal.querySelector('#edit-price').value),
                 imageUrl: editModal.querySelector('#edit-imageUrl').value,
                 change: { type: editModal.querySelector('#edit-changeType').value, value: editModal.querySelector('#edit-changeValue').value }
             };
-            data.id = id;
 
             try {
                 const response = await fetch('/.netlify/functions/update-archived-investment', { method: 'POST', body: JSON.stringify(data) });
@@ -190,7 +190,7 @@
         };
 
         const handleRestore = async (id) => {
-            if (!confirm('Відновити це вкладення?')) return;
+            if (!confirm('Відновити це вкладення? Воно знову з\'явиться на сайті.')) return;
             try {
                 const response = await fetch('/.netlify/functions/restore-investment', { method: 'POST', body: JSON.stringify({ id }) });
                 if (!response.ok) throw new Error('Не вдалося відновити.');
