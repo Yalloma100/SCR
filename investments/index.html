@@ -6,7 +6,8 @@
     <title>Вкладення - SCR</title>
     <link rel="icon" href="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239333ea' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z'/%3e%3c/svg%3e">
     <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-<script src="https://www.paypal.com/sdk/js?client-id=ASJIOL6y24xuwQiCC-a8RBkVypAp5VuYLf7cXEIzc4aLV5yYEXDVvellq-OGQQfZjkqJBZh1h0JqS9mU&currency=USD"></script>    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <script src="https://www.paypal.com/sdk/js?client-id=ASJIOL6y24xuwQiCC-a8RBkVypAp5VuYLf7cXEIzc4aLV5yYEXDVvellq-OGQQfZjkqJBZh1h0JqS9mU&currency=USD"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -25,7 +26,6 @@
         }
         *, ::after, ::before { box-sizing: border-box; }
         body, html { margin: 0; font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: var(--text-primary); }
-        
         .page-container { display: grid; grid-template-columns: var(--sidebar-width-expanded) 1fr; min-height: 100vh; }
         .sidebar { background-color: var(--bg-sidebar); backdrop-filter: blur(10px); border-right: 1px solid var(--border-color); padding: 1.5rem; display: flex; flex-direction: column; position: fixed; left: 0; top: 0; height: 100%; width: var(--sidebar-width-expanded); z-index: 1100; }
         .sidebar-header { display: flex; align-items: center; margin-bottom: 2.5rem; color: var(--text-primary); text-decoration: none; }
@@ -38,10 +38,8 @@
         .nav-text { white-space: nowrap; }
         .sidebar-footer { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border-color); }
         .footer-btn { background: none; border: none; width: 100%; display: flex; align-items: center; padding: .8rem 1rem; color: var(--text-secondary); font-size: 1rem; font-weight: 500; cursor: pointer; border-radius: 8px; }
-        
         .page-header { position: sticky; top: 0; grid-column: 2 / 3; display: flex; justify-content: space-between; align-items: center; padding: 1rem 2.5rem; height: 72px; z-index: 1000; background-color: var(--bg-header); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); }
         .main-content { grid-column: 2 / 3; padding: 2.5rem; }
-        
         .investments-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
         .investment-card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.3s, box-shadow 0.3s; }
         .investment-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px var(--shadow-color); }
@@ -59,7 +57,6 @@
         .btn-primary { background-image: linear-gradient(120deg, var(--primary-color) 0%, #8b5cf6 100%); color: white; }
         .btn:disabled { opacity: 0.7; cursor: not-allowed; }
         .btn-success { background-color: var(--success-color); color: white; cursor: default; }
-
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1200; opacity: 0; visibility: hidden; transition: opacity .3s; }
         .modal-overlay.visible { opacity: 1; visibility: visible; }
         .modal-content { background-color: var(--bg-sidebar); border-radius: 16px; padding: 2rem; width: 90%; max-width: 420px; }
@@ -70,6 +67,7 @@
         #confirm-purchase-btn { width: 100%; }
         #modal-status { text-align: center; margin-top: 1rem; font-weight: 500; min-height: 20px;}
         .hidden { display: none; }
+        .new-items-notification { background-color: var(--success-color); color: white; padding: 1rem; text-align: center; border-radius: 8px; margin-bottom: 1.5rem; font-weight: 500; }
     </style>
 </head>
 <body>
@@ -89,16 +87,13 @@
                  <button class="footer-btn" id="logout-button" title="Вийти з акаунту"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></span><span class="nav-text">Вийти</span></button>
             </div>
         </aside>
-
         <header class="page-header"><h1>Вкладення</h1></header>
-
         <main class="main-content">
             <div id="investments-grid" class="investments-grid">
                 <p>Завантаження вкладень...</p>
             </div>
         </main>
     </div>
-
     <div id="purchase-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -133,13 +128,25 @@
         let userBalance = 0;
 
         const renderCards = (investments, userPurchaseIds) => {
-            grid.innerHTML = '';
+            const purchaseIdSet = new Set(userPurchaseIds);
+            grid.innerHTML = ''; // Очищуємо перед рендерингом
+            
+            const lastVisit = localStorage.getItem('lastVisit');
+            const newItems = investments.filter(inv => !lastVisit || new Date(inv.createdAt) > new Date(lastVisit));
+            if (newItems.length > 0 && grid.querySelector('.new-items-notification') === null) {
+                const notification = document.createElement('div');
+                notification.className = 'new-items-notification';
+                notification.textContent = `З'явилося ${newItems.length} нових вкладень!`;
+                grid.prepend(notification);
+            }
+
             if (!investments || investments.length === 0) {
-                grid.innerHTML = '<p>Наразі немає доступних вкладень.</p>';
+                grid.insertAdjacentHTML('beforeend', '<p>Наразі немає доступних вкладень.</p>');
                 return;
             }
+
             investments.forEach(inv => {
-                const isPurchased = userPurchaseIds.includes(inv.id);
+                const isPurchased = purchaseIdSet.has(inv.id);
                 const card = document.createElement('div');
                 card.className = 'investment-card';
                 card.innerHTML = `
@@ -180,8 +187,13 @@
                     throw new Error(err.error || 'Не вдалося завантажити дані.');
                 }
                 const data = await response.json();
-                renderCards(data.investments, data.userPurchaseIds);
+                const purchaseIds = data.userPurchaseIds.map(p => p.investmentId); // Отримуємо тільки ID
+                renderCards(data.investments, purchaseIds);
                 userBalance = data.balance;
+                
+                // Оновлюємо мітку часу після успішного завантаження
+                localStorage.setItem('lastVisit', new Date().toISOString());
+
             } catch (error) {
                 grid.innerHTML = `<p style="color:var(--danger-color);">${error.message}</p>`;
             }
@@ -190,7 +202,6 @@
         const openModal = (inv) => {
             currentInvestment = inv;
             document.getElementById('modal-title').textContent = `Вкладення в "${inv.title}"`;
-            // ВИПРАВЛЕНО: Додано перевірку, щоб уникнути помилки, якщо userBalance ще не завантажено
             document.getElementById('balance-info').textContent = `Ваш баланс: ${(userBalance || 0).toFixed(2)} USD`;
             document.getElementById('modal-status').textContent = '';
             document.getElementById('step-1').classList.remove('hidden');
@@ -216,7 +227,7 @@
                     document.getElementById('step-2').classList.remove('hidden');
                     document.getElementById('paypal-info').textContent = `Для покупки не вистачає ${shortfall.toFixed(2)} USD. Будь ласка, поповніть баланс.`;
                     renderPayPalButtons(shortfall);
-                    return;
+                    return; // Зупиняємо виконання, чекаємо на поповнення
                 }
 
                 const token = user.token.access_token;
@@ -229,7 +240,7 @@
                 if (!response.ok) throw new Error(result.error);
                 
                 statusEl.textContent = 'Успішно куплено!';
-                await loadData();
+                await loadData(); // Перезавантажуємо всі дані
                 setTimeout(closeModal, 1500);
 
             } catch (error) {
