@@ -1,7 +1,7 @@
+// /functions/create-investment.js
 const { performTransactionalUpdate } = require('./db-manager');
 
 exports.handler = async (event) => {
-    // Тут можна додати перевірку паролю адміна, якщо потрібен додатковий захист
     if (event.httpMethod !== 'POST') {
         return { statusCode: 405, body: 'Method Not Allowed' };
     }
@@ -9,11 +9,10 @@ exports.handler = async (event) => {
     try {
         const newInvestmentData = JSON.parse(event.body);
 
-        // Генеруємо унікальний ID
         newInvestmentData.id = `inv_${Date.now()}`;
+        newInvestmentData.createdAt = new Date().toISOString(); // Додаємо час створення
 
         await performTransactionalUpdate('investments.json', (investments) => {
-            // Просто додаємо новий елемент до масиву
             investments.push(newInvestmentData);
             return investments;
         });
